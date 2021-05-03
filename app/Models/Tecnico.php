@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tecnico extends Model
 {
-    use HasFactory;
+    protected $fillable = ['numero_registro', 'senha', 'id_pessoa', 'id_grupo'];
+    protected $table = 'tecnico';
 }
