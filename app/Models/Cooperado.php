@@ -7,5 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cooperado extends Model
 {
-    use HasFactory;
+    protected $fillable  = ['id_pessoa'];
+    protected $table = 'cooperado';
+
+    public function pessoa(){
+        return $this->hasOne(Pessoa::class , 'id' , 'id_pessoa');
+    }
 }

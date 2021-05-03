@@ -19,3 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('tecnico/store' , 'App\Http\Controllers\TecnicoController@store');
+Route::post('cooperado/store' , 'App\Http\Controllers\CooperadoController@store');
