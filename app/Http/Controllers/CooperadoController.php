@@ -35,13 +35,12 @@ class CooperadoController extends Controller
 
         # cadastro pessoa
         $inputs = $request->all();
-        $inputs['numero'] = $request->phone['number'];
+        $inputs['numero'] = $request->phone['numero'];
         $inputs['codigo_area'] = '2121';
         $inputs['status'] = true;
         $pessoa = $this->objPessoa->create($inputs);
 
         #cadastro cooperado
-
-
+        dd($cooperado = $this->objCooperado->pessoa->telefone->create($inputs));
     }
 }

@@ -11,6 +11,6 @@ class Pessoa extends Model
     protected $table = 'pessoa';
 
     public function telefone(){
-        return $this->hasOne(Pessoa::class, 'id_telefone' , 'id');
+        return $this->belongsTo(Telefone::class, 'id_telefone');
     }
 }
