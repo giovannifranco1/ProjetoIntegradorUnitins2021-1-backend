@@ -41,6 +41,6 @@ class CooperadoController extends Controller
         $pessoa = $this->objPessoa->create($inputs);
 
         #cadastro cooperado
-        dd($cooperado = $this->objCooperado->pessoa->telefone->create($inputs));
+        $cooperado = $this->objCooperado->pessoa->telefone->create($inputs);
     }
 }
