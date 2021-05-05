@@ -38,6 +38,10 @@ class CooperadoController extends Controller
         $inputs['numero'] = $request->phone['numero'];
         $inputs['codigo_area'] = '2121';
         $inputs['status'] = true;
+
+        //cadastro telefone
+        $telefone = $this->objTelefone->create($inputs);
+        $inputs['id_telefone'] = $telefone->id;
         $pessoa = $this->objPessoa->create($inputs);
 
         #cadastro cooperado
