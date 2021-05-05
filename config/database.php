@@ -64,8 +64,8 @@ return [
         ],
 
         'pgsql' => [
-            'driver' => 'pgsql',
-            'url' => env('DATABASE_URL', 'postgres://ggkzhuigeipwqt:2cf06186fe28cdf911735821e8f38a4e86acd3b88485ab89b5b540294a05dd45@ec2-54-161-239-198.compute-1.amazonaws.com:5432/d627gk4v7nm6ke'),
+            'driver' => 'pgql',
+            'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', 'ec2-54-161-239-198.compute-1.amazonaws.com'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'd627gk4v7nm6ke'),
