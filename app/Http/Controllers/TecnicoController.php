@@ -39,7 +39,6 @@ class TecnicoController extends Controller
         //cadastro pessoa
         $inputs['id_telefone'] = $telefone->id;
         $inputs['status'] = true;
-        $inputs['nome'] = $request->name;
         $pessoa = $this->objPessoa->create($inputs);
 
         //cadastro tecnico
