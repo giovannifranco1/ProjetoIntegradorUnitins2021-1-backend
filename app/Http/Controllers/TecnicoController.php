@@ -32,13 +32,16 @@ class TecnicoController extends Controller
         $inputs = $request->all();
         $inputs['numero'] = $request->phone['number'];
         $inputs['codigo_area'] = '2121';
+
         //cadastro telefone
         $telefone = $this->objTelefone->create($inputs);
+
         //cadastro pessoa
         $inputs['id_telefone'] = $telefone->id;
         $inputs['status'] = true;
         $inputs['nome'] = $request->name;
         $pessoa = $this->objPessoa->create($inputs);
+
         //cadastro tecnico
         $inputs['numero_registro'] = $request->register;
         $inputs['senha'] = bcrypt($request->password);
