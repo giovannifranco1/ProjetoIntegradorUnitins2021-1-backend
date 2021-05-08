@@ -25,10 +25,10 @@ Route::group([
 
 ], function ($router) {
 
-    Route::post('login', 'Auth\AuthController@login');
-    Route::post('logout', 'Auth\AuthController@logout');
-    Route::post('refresh', 'Auth\AuthController@refresh');
-    Route::post('me', 'Auth\AuthController@me');
+    Route::post('login', 'app\Http\Controllers\Auth\AuthController@login');
+    Route::post('logout', 'app\Http\Controllers\Auth\AuthController@logout');
+    Route::post('refresh', 'app\Http\Controllers\Auth\AuthController@refresh');
+    Route::post('me', 'app\Http\Controllers\Auth\AuthController@me');
 
 });
 
