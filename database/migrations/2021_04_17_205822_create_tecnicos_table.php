@@ -20,11 +20,9 @@ class CreateTecnicosTable extends Migration
             $table->unsignedBigInteger('id_pessoa');
             $table->unsignedBigInteger('id_grupo');
             $table->foreign('id_pessoa')->references('id')->on('pessoa')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('id_grupo')->references('id')->on('grupo')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      *

@@ -35,3 +35,4 @@ Route::group([
 Route::post('tecnico/store' , 'App\Http\Controllers\TecnicoController@store');
 Route::post('cooperado/store' , 'App\Http\Controllers\CooperadoController@store');
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');
+
