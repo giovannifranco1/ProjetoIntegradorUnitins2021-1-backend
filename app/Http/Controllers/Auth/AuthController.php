@@ -22,8 +22,8 @@ class AuthController extends Controller
     // Validator Method
     protected function companyValidator($request){
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:100',
-            'email' => 'required|email|unique:users'
+            'email' => 'required|email|unique:users',
+            'password' => 'required|max:100'
         ]);
         return $validator;
     }
