@@ -23,6 +23,7 @@ class CreateVisitasTable extends Migration
             $table->foreign('id_tecnico')->references('id')->on('tecnico')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_propriedade')->references('id')->on('propriedade')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_motivo_visita')->references('id')->on('motivo_visita')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('status')->default('aberto');
             $table->timestamps();
         });
     }
