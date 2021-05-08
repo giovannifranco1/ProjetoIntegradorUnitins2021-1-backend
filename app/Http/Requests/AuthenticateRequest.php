@@ -24,9 +24,9 @@ class AuthenticateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        return response()->json([
             'email' => 'required',
             'password' => 'required'
-        ];
+        ]);
     }
 }

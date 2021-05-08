@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AuthenticateRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -18,13 +19,28 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login']]);
     }
 
+    // Validator Method
+    protected function companyValidator($request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:100',
+            'email' => 'required|email|unique:companies'
+        ]);
+        return $validator;
+    }
     /**
      * Get a JWT via given credentials.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(AuthenticateRequest $request)
+    public function login(Request $request)
     {
+        $validator = $this->companyValidator($request);
+        if($validator->fails() ) {
+            return response()->json([
+                'message' => 'Validation Failed',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
         $credentials = $request->all();
 
         if (! $token = auth::attempt($credentials)) {
