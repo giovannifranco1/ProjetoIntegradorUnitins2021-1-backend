@@ -23,7 +23,7 @@ class AuthController extends Controller
     protected function companyValidator($request){
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:100',
-            'email' => 'required|email|unique:companies'
+            'email' => 'required|email|unique:users'
         ]);
         return $validator;
     }
