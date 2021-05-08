@@ -18,7 +18,6 @@ class CreateTecnicosTable extends Migration
             $table->string('numero_registro');
             $table->string('senha');
             $table->unsignedBigInteger('id_pessoa');
-            $table->unsignedBigInteger('id_grupo');
             $table->foreign('id_pessoa')->references('id')->on('pessoa')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

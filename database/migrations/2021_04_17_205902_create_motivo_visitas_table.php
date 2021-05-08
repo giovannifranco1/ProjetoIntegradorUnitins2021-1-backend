@@ -15,8 +15,7 @@ class CreateMotivoVisitasTable extends Migration
     {
         Schema::create('motivo_visita', function (Blueprint $table) {
             $table->id();
-            $table->string('nome' , 100);
-            $table->longText('descricao');
+            $table->string('nome');
             $table->timestamps();
         });
     }
