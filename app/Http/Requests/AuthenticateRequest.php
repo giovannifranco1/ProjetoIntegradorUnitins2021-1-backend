@@ -24,14 +24,9 @@ class AuthenticateRequest extends FormRequest
      */
     public function rules()
     {
-        $validator = Validator::make([
+        return [
             'email' => 'required',
             'password' => 'required'
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['message' => $validator->errors()]);
-        }
-        return $validator;
+        ];
     }
 }
