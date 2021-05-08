@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AuthenticateRequest;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -22,7 +23,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(AuthenticateRequest $request)
     {
         $credentials = request(['email', 'password']);
 
