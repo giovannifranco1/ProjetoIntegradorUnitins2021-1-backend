@@ -11,7 +11,7 @@ class PainelController extends Controller
 {
     public function index(Request $request){
         $tecnico = Tecnico::findId($request->nome);
-        $visita = Visita::where('id_tecnico', 'like', "%{$tecnico->id}%")
+        $visita = Visita::where('id_tecnico', 'like', "%{$tecnico}%")
         ->orderBy('dia_visita' , 'desc')
         ->paginate(7);
 
