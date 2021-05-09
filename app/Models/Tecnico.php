@@ -21,7 +21,7 @@ class Tecnico extends Model
         return $this->hasOne(Pessoa::class , 'id' , 'id_pessoa');
     }
 
-    public function getId($nome){
+    public static function findId($nome){
         $_pessoa = Pessoa::where('nome', $nome)->fisrt();
         $_tecnico = Tecnico::where('id_pessoa', $_pessoa->id)->fisrt();
 

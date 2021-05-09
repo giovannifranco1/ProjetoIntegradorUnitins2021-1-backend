@@ -10,8 +10,7 @@ use Illuminate\Http\Request;
 class PainelController extends Controller
 {
     public function index(Request $request){
-        dd(Tecnico::find(1));
-        $pessoa = Tecnico::where('nome' , $request->tecnico)->first();
+        $tecnico = Tecnico::findId($request->nome);
         $visita = Visita::where('id_tecnico', 'like', "%{$tecnico->id}%")
         ->orderBy('dia_visita' , 'desc')
         ->paginate(7);
