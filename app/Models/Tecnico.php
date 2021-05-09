@@ -15,6 +15,16 @@ class Tecnico extends Model
         'senha', 'id_pessoa',
         'id_grupo'
     ];
-
     protected $table = 'tecnico';
+
+    public function pessoa(){
+        return $this->hasOne(Pessoa::class , 'id' , 'id_pessoa');
+    }
+
+    public function getId($nome){
+        $_pessoa = Pessoa::where('nome', $nome)->fisrt();
+        $_tecnico = Tecnico::where('id_pessoa', $_pessoa->id)->fisrt();
+
+        return $_tecnico->id;
+    }
 }
