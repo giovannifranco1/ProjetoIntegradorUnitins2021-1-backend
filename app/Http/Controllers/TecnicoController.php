@@ -14,6 +14,16 @@ class TecnicoController extends Controller
     private $objTecnico;
     private $objTelefone;
 
+    private function companyValidator($request){
+        $validator = Validator::make($request->all(), [
+            'nome' => 'required|max:255',
+            'email' => 'required|email|unique:pessoa',
+            'cpf' => 'required|max:14|min:14',
+            'senha' => 'required|min:8',
+            'numero_registro' => 'required',
+        ]);
+        return $validator;
+    }
     public function __construct()
     {
         $this->objTecnico = new Tecnico();
@@ -21,17 +31,17 @@ class TecnicoController extends Controller
         $this->objTelefone = new Telefone();
     }
     public function store(Request $request){
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required|max:255',
-            'email' => 'required|email',
-            'cpf' => 'required|max:14|min:14'
-        ]);
-        if($validator->fails()){
-            return response()->json(['message' => $validator->errors()]);
+        $validator = $this->companyValidator($request);
+        if($validator->fails() ) {
+            return response()->json([
+                'message' => 'Validation Failed',
+                'errors'  => $validator->errors()
+            ], 422);
         }
+
         $inputs = $request->all();
-        $inputs['numero'] = $request->phone['numero'];
-        $inputs['codigo_area'] = $request->phone['codigo_area'];
+        $inputs['numero'] = $request->telefone['numero'];
+        $inputs['codigo_area'] = $request->telefone['codigo_area'];
 
         //cadastro telefone
         $telefone = $this->objTelefone->create($inputs);
@@ -42,8 +52,7 @@ class TecnicoController extends Controller
         $pessoa = $this->objPessoa->create($inputs);
 
         //cadastro tecnico
-        $inputs['numero_registro'] = $request->register;
-        $inputs['senha'] = bcrypt($request->password);
+        $inputs['senha'] = bcrypt($request->senha);
         $inputs['id_pessoa'] = $pessoa->id;
 
         $tecnico = $this->objTecnico->create($inputs);
