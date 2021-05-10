@@ -23,7 +23,7 @@ class Tecnico extends Model
 
     public static function findId($nome){
         $_pessoa = Pessoa::where('nome', $nome)->first();
-        dd($_tecnico = Tecnico::where('id_pessoa', $_pessoa->id)->first());
+        $_tecnico = Tecnico::where('id_pessoa', 1)->first();
 
         return $_tecnico->id;
     }

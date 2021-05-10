@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pessoa extends Model
 {
-    protected $fillable = ['nome', 'email', 'cpf', 'id_telefone', 'status'];
+    protected $fillable = ['nome', 'sobrenome', 'email', 'cpf', 'id_telefone'];
     protected $table = 'pessoa';
 
     public function telefone(){

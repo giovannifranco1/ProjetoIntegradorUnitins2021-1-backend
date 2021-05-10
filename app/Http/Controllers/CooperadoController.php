@@ -21,29 +21,33 @@ class CooperadoController extends Controller
         $this->objPessoa = new Pessoa();
         $this->objTelefone = new Telefone();
     }
-
-    public function store(Request $request)
-    {
+    protected function companyValidator($request){
         $validator = Validator::make($request->all(), [
             'nome' => 'required|max:255',
             'email' => 'required|email',
             'cpf' => 'required|max:14|min:14'
         ]);
-        if($validator->fails()){
-            return response()->json(['message' => $validator->errors()]);
+        return $validator;
+    }
+    public function store(Request $request)
+    {
+        $validator = $this->companyValidator($request);
+        if($validator->fails() ) {
+            return response()->json([
+                'message' => 'Validation Failed',
+                'errors'  => $validator->errors()
+            ], 422);
         }
-
-        # cadastro pessoa
         $inputs = $request->all();
         $inputs['numero'] = $request->phone['numero'];
         $inputs['codigo_area'] = '2121';
-        $inputs['status'] = true;
 
-        //cadastro telefone
+        # cadastro telefone
         $telefone = $this->objTelefone->create($inputs);
         $inputs['id_telefone'] = $telefone->id;
+        # cadastro pessoa
         $pessoa = $this->objPessoa->create($inputs);
-
-        #cadastro cooperado
+        # cadastro cooperado
+        $pessoa->coopeado()->create($inputs);
     }
 }

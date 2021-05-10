@@ -21,7 +21,6 @@ class CreatePessoasTable extends Migration
             $table->string('cpf' , 14);
             $table->unsignedBigInteger('id_telefone');
             $table->foreign('id_telefone')->references('id')->on('telefone')->onUpdate('cascade')->onDelete('cascade');
-            $table->boolean('status');
             $table->timestamps();
         });
     }

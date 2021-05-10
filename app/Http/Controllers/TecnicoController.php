@@ -30,8 +30,8 @@ class TecnicoController extends Controller
             return response()->json(['message' => $validator->errors()]);
         }
         $inputs = $request->all();
-        $inputs['numero'] = $request->phone['number'];
-        $inputs['codigo_area'] = '2121';
+        $inputs['numero'] = $request->phone['numero'];
+        $inputs['codigo_area'] = $request->phone['codigo_area'];
 
         //cadastro telefone
         $telefone = $this->objTelefone->create($inputs);
@@ -45,7 +45,6 @@ class TecnicoController extends Controller
         $inputs['numero_registro'] = $request->register;
         $inputs['senha'] = bcrypt($request->password);
         $inputs['id_pessoa'] = $pessoa->id;
-        $inputs['id_grupo'] = 1;
 
         $tecnico = $this->objTecnico->create($inputs);
 
