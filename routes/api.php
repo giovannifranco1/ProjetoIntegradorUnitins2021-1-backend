@@ -32,7 +32,11 @@ Route::group([
 
 });
 
-Route::post('tecnico/store' , 'App\Http\Controllers\TecnicoController@store');
-Route::post('cooperado/store' , 'App\Http\Controllers\CooperadoController@store');
+Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
+Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll');
+
+Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
+Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
+
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');
 

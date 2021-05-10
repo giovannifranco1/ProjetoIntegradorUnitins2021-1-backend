@@ -45,9 +45,17 @@ class CooperadoController extends Controller
         # cadastro telefone
         $telefone = $this->objTelefone->create($inputs);
         $inputs['id_telefone'] = $telefone->id;
+
         # cadastro pessoa
         $pessoa = $this->objPessoa->create($inputs);
+
         # cadastro cooperado
-        $pessoa->coopeado()->create($inputs);
+        $cooperado = new Cooperado();
+        dd($cooperado->pessoa()->associate($inputs));
+    }
+    public function findAll(){
+        return Cooperado::select('cooperado.id','p.nome as nome_cooperado' , 'p.cpf as cpf_cooperado',)
+            ->join('pessoa as p' ,'p.id', 'cooperado.id_pessoa')
+            ->get();
     }
 }

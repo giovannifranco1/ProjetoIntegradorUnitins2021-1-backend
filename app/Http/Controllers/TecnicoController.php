@@ -52,4 +52,10 @@ class TecnicoController extends Controller
             return response()->json(['status' => 'success']);
         }
     }
+
+    public function findAll(){
+        return Tecnico::select('tecnico.id','p.nome as nome_tecnico' , 'p.cpf as cpf_tecnico',)
+            ->join('pessoa as p' ,'p.id', 'tecnico.id_pessoa')
+            ->get();
+    }
 }

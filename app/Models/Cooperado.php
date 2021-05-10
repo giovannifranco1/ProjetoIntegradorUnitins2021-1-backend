@@ -11,6 +11,6 @@ class Cooperado extends Model
     protected $table = 'cooperado';
 
     public function pessoa(){
-        return $this->hasOne(Pessoa::class , 'id' , 'id_pessoa');
+        return $this->belongsTo(Pessoa::class);
     }
 }

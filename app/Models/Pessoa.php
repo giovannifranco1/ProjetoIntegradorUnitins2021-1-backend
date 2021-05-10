@@ -13,4 +13,7 @@ class Pessoa extends Model
     public function telefone(){
         return $this->belongsTo(Telefone::class, 'id_telefone');
     }
+    public function cooperado(){
+        return $this->hasOne(Pessoa::class);
+    }
 }
