@@ -18,6 +18,7 @@ class TecnicoController extends Controller
         $validator = Validator::make($request->all(), [
             'nome' => 'required|max:255',
             'email' => 'required|email|unique:pessoa',
+            'sobrenome' => 'required',
             'cpf' => 'required|max:14|min:14',
             'senha' => 'required|min:8',
             'numero_registro' => 'required',
