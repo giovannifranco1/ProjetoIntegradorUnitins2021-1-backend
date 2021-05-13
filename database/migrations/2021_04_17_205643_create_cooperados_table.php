@@ -17,6 +17,7 @@ class CreateCooperadosTable extends Migration
             $table->id();
             $table->unsignedBigInteger('id_pessoa');
             $table->foreign('id_pessoa')->references('id')->on('pessoa')->onDelete('cascade')->onUpdate('cascade');
+            $table->boolean('status');
             $table->timestamps();
         });
     }
