@@ -4,27 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Tecnico extends Model
+class Tecnico extends Authenticatable implements JWTSubject
 {
-    use HasRoles;
+  protected $fillable = [
+    'nome',
+    'cpf',
+    'sobrenome',
+    'numero_registro',
+    'id_telefone',
+    'id_user',
+    'status'
+  ];
+  protected $table = 'tecnico';
 
-    protected $fillable = [
-        'numero_registro',
-        'senha', 'id_pessoa',
-        'id_grupo'
-    ];
-    protected $table = 'tecnico';
-
-    public function pessoa(){
-        return $this->hasOne(Pessoa::class , 'id' , 'id_pessoa');
-    }
-
-    public static function findId($nome){
-        $_pessoa = Pessoa::where('nome', $nome)->first();
-        $_tecnico = Tecnico::where('id_pessoa', 1)->first();
-
-        return $_tecnico->id;
-    }
+  public function getJWTIdentifier()
+  {
+    return $this->getKey();
+  }
+  /**
+   * Return a key value array, containing any custom claims to be added to the JWT.
+   *
+   * @return array
+   */
+  public function getJWTCustomClaims()
+  {
+    return [];
+  }
 }

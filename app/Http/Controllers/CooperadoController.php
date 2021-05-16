@@ -11,17 +11,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CooperadoController extends Controller
 {
-    private $objCooperado;
-    private $objPessoa;
-    private $objTelefone;
-
     public function __construct()
     {
-        $this->objCooperado = new Cooperado();
-        $this->objPessoa = new Pessoa();
-        $this->objTelefone = new Telefone();
+
     }
-    protected function companyValidator($request){
+    private function companyValidator($request){
         $validator = Validator::make($request->all(), [
             'nome' => 'required|max:255',
             'email' => 'required|email',
@@ -43,15 +37,15 @@ class CooperadoController extends Controller
         $inputs['codigo_area'] = '2121';
 
         # cadastro telefone
-        $telefone = $this->objTelefone->create($inputs);
+        $telefone = Telefone::create($inputs);
         $inputs['id_telefone'] = $telefone->id;
-
         # cadastro pessoa
-        $pessoa = $this->objPessoa->create($inputs);
-
+        $pessoa = Pessoa::create($inputs);
         # cadastro cooperado
-        $cooperado = new Cooperado();
-        dd($cooperado->pessoa()->associate($inputs));
+        $inputs['id_pessoa'] = $pessoa->id;
+        $cooperado= Cooperado::create($inputs);
+
+
     }
     public function findAll(){
         return Cooperado::select('cooperado.id','p.nome as nome_cooperado' , 'p.cpf as cpf_cooperado',)
