@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\MotivoVisita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,12 +32,19 @@ Route::group([
     Route::post('me', 'App\Http\Controllers\Auth\AuthController@me');
 
 });
-
+#Rotas Tecnico
 Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
 Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll');
 
+#Rotas Cooperado
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
 
+#Rotas painel
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');
 
+#Rotas Motivo visita
+Route::get('motivos', 'App\Http\Controllers\MotivoVisitaController@index');
+Route::post('motivos', 'App\Http\Controllers\MotivoVisitaController@store');
+Route::put('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@update');
+Route::delete('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@destroy');
