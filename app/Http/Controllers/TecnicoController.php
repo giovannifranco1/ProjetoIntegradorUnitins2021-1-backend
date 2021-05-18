@@ -98,7 +98,7 @@ class TecnicoController extends Controller
       'tecnico.cpf',
       'u.email',
       'tecnico.numero_registro',
-      DB::raw('CONCAT("(", t.codigo_area, ") ", t.numero) as phone')
+      DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
     )
     ->join('users as u', 'u.id', 'tecnico.id_user')
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
