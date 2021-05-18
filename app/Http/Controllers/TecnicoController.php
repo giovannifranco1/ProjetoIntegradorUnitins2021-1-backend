@@ -83,12 +83,28 @@ class TecnicoController extends Controller
       return response()->json(['message' => 'success']);
     }
   }
-  public function findAll()
-  {
+  public function findAll() {
     return Tecnico::select(
       'tecnico.id',
       'tecnico.nome as nome_tecnico',
       'tecnico.cpf as cpf_tecnico',
     )->get();
+  }
+  public function findById($id) {
+    return Tecnico::select(
+      'tecnico.id',
+      'tecnico.nome',
+      'tecnico.sobrenome',
+      'tecnico.cpf',
+      't.codigo_area as codigo_area',
+      't.numero as numero',
+      'u.email',
+      'tecnico.registro',
+      'tecnico.id_grupo'
+    )
+    ->join('user as u', 'u.id', 'tecnico.id_user')
+    ->join('telefone as t', 't.id', 'tecnico.id_telefone')
+    ->where('tecnico.id', $id)
+    ->get();
   }
 }

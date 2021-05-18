@@ -34,6 +34,7 @@ Route::group([
 });
 #Rotas Tecnico
 Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
+Route::get('tecnico/{id}', 'App\Http\Controllers\TecnicoController@findById');
 Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll');
 
 #Rotas Cooperado
