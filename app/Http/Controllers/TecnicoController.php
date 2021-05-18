@@ -96,15 +96,13 @@ class TecnicoController extends Controller
       'tecnico.nome',
       'tecnico.sobrenome',
       'tecnico.cpf',
-      't.codigo_area as codigo_area',
-      't.numero as numero',
       'u.email',
-      'tecnico.registro',
-      'tecnico.id_grupo'
+      'tecnico.numero_registro',
+      DB::raw('CONCAT("(", t.codigo_area, ") ", t.numero) as phone')
     )
-    ->join('user as u', 'u.id', 'tecnico.id_user')
+    ->join('users as u', 'u.id', 'tecnico.id_user')
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
-    ->get();
+    ->first();
   }
 }
