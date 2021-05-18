@@ -87,10 +87,8 @@ class TecnicoController extends Controller
   {
     return Tecnico::select(
       'tecnico.id',
-      'p.nome as nome_tecnico',
-      'p.cpf as cpf_tecnico',
-    )
-      ->join('pessoa as p', 'p.id', 'tecnico.id_pessoa')
-      ->get();
+      'tecnico.nome as nome_tecnico',
+      'tecnico.cpf as cpf_tecnico',
+    )->get();
   }
 }
