@@ -75,7 +75,6 @@ class TecnicoController extends Controller
       $tecnico = Tecnico::create($inputs);
       DB::commit();
     }catch (Exception $e) {
-      dd($e);
       DB::rollback();
       return response()->json(['message' => 'Erro ao cadastrar'], 500);
     }
@@ -100,7 +99,6 @@ class TecnicoController extends Controller
     }
     try {
       DB::beginTransaction();
-      $inputs = $request->except(['id_grupo', 'id_tecnico']);
 
       $tecnico = Tecnico::find($id);
       $phone = Telefone::find($tecnico->id_telefone);
@@ -116,7 +114,6 @@ class TecnicoController extends Controller
 
       DB::commit();
     }catch (Exception $e) {
-      dd($e);
       DB::rollback();
       return response()->json(['message' => 'Não foi possível alterar os dados.'], 500);
     }
@@ -127,6 +124,7 @@ class TecnicoController extends Controller
       'tecnico.id',
       'tecnico.nome as nome_tecnico',
       'tecnico.cpf as cpf_tecnico',
+      'tecnico.status'
     )->get();
   }
   public function findById($id) {
@@ -135,6 +133,7 @@ class TecnicoController extends Controller
       'tecnico.nome',
       'tecnico.sobrenome',
       'tecnico.cpf',
+      'tecnico.status',
       'u.email',
       'tecnico.numero_registro',
       DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
@@ -143,5 +142,31 @@ class TecnicoController extends Controller
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
     ->first();
+  }
+  private function setStatus(bool $status, $id) {
+    try {
+      DB::beginTransaction();
+
+      $tecnico = Tecnico::find($id);
+
+      $tecnico->update(['status' => $status]);
+
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollback();
+      return array('response' => [
+        'message' => 'error',
+        'errors' => ['Não foi possível atualizar o status.']
+      ], 'status' => 500);
+    }
+    return array('response' => ['message' => 'success'], 'status' => 200);
+  }
+  public function disable($id) {
+    $result = $this->setStatus(false, $id);
+    return response()->json($result['response'], $result['status']);
+  }
+  public function enable($id) {
+    $result = $this->setStatus(true, $id);
+    return response()->json($result['response'], $result['status']);
   }
 }
