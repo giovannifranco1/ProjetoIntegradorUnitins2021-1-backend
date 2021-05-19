@@ -83,6 +83,45 @@ class TecnicoController extends Controller
       return response()->json(['message' => 'success']);
     }
   }
+  public function update(Request $request, $id) {
+    $validator = Validator::make($request->all(), [
+      'nome' => 'required|max:255',
+      'email' => 'required|email',
+      'sobrenome' => 'required',
+      'cpf' => 'required|max:14|min:14',
+      'numero_registro' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validação inválida',
+        'errors'  => $validator->errors()
+      ], 422);
+    }
+    try {
+      DB::beginTransaction();
+      $inputs = $request->except(['id_grupo', 'id_tecnico']);
+
+      $tecnico = Tecnico::find($id);
+      $phone = Telefone::find($tecnico->id_telefone);
+      $user = User::find($tecnico->id_user);
+
+      $data = $request->all();
+      $data['numero'] = $request->telefone['numero'];
+      $data['codigo_area'] = $request->telefone['codigo_area'];
+
+      $tecnico->update($data);
+      $phone->update($data);
+      $user->update($data);
+
+      DB::commit();
+    }catch (Exception $e) {
+      dd($e);
+      DB::rollback();
+      return response()->json(['message' => 'Não foi possível alterar os dados.'], 500);
+    }
+    return response()->json(['message' => 'success']);
+  }
   public function findAll() {
     return Tecnico::select(
       'tecnico.id',
