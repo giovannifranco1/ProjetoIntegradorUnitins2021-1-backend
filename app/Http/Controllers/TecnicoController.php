@@ -75,7 +75,6 @@ class TecnicoController extends Controller
       $tecnico = Tecnico::create($inputs);
       DB::commit();
     }catch (Exception $e) {
-      dd($e);
       DB::rollback();
       return response()->json(['message' => 'Erro ao cadastrar'], 500);
     }
@@ -83,11 +82,49 @@ class TecnicoController extends Controller
       return response()->json(['message' => 'success']);
     }
   }
+  public function update(Request $request, $id) {
+    $validator = Validator::make($request->all(), [
+      'nome' => 'required|max:255',
+      'email' => 'required|email',
+      'sobrenome' => 'required',
+      'cpf' => 'required|max:14|min:14',
+      'numero_registro' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validação inválida',
+        'errors'  => $validator->errors()
+      ], 422);
+    }
+    try {
+      DB::beginTransaction();
+
+      $tecnico = Tecnico::find($id);
+      $phone = Telefone::find($tecnico->id_telefone);
+      $user = User::find($tecnico->id_user);
+
+      $data = $request->all();
+      $data['numero'] = $request->telefone['numero'];
+      $data['codigo_area'] = $request->telefone['codigo_area'];
+
+      $tecnico->update($data);
+      $phone->update($data);
+      $user->update($data);
+
+      DB::commit();
+    }catch (Exception $e) {
+      DB::rollback();
+      return response()->json(['message' => 'Não foi possível alterar os dados.'], 500);
+    }
+    return response()->json(['message' => 'success']);
+  }
   public function findAll() {
     return Tecnico::select(
       'tecnico.id',
       'tecnico.nome as nome_tecnico',
       'tecnico.cpf as cpf_tecnico',
+      'tecnico.status'
     )->get();
   }
   public function findById($id) {
@@ -96,6 +133,7 @@ class TecnicoController extends Controller
       'tecnico.nome',
       'tecnico.sobrenome',
       'tecnico.cpf',
+      'tecnico.status',
       'u.email',
       'tecnico.numero_registro',
       DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
@@ -104,5 +142,31 @@ class TecnicoController extends Controller
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
     ->first();
+  }
+  private function setStatus(bool $status, $id) {
+    try {
+      DB::beginTransaction();
+
+      $tecnico = Tecnico::find($id);
+
+      $tecnico->update(['status' => $status]);
+
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollback();
+      return array('response' => [
+        'message' => 'error',
+        'errors' => ['Não foi possível atualizar o status.']
+      ], 'status' => 500);
+    }
+    return array('response' => ['message' => 'success'], 'status' => 200);
+  }
+  public function disable($id) {
+    $result = $this->setStatus(false, $id);
+    return response()->json($result['response'], $result['status']);
+  }
+  public function enable($id) {
+    $result = $this->setStatus(true, $id);
+    return response()->json($result['response'], $result['status']);
   }
 }
