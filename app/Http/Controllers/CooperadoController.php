@@ -6,46 +6,70 @@ use App\Models\Cooperado;
 use App\Models\Pessoa;
 use App\Models\Tecnico;
 use App\Models\Telefone;
+use App\Models\Propriedade;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class CooperadoController extends Controller
-{
-    public function __construct()
-    {
-
-    }
+class CooperadoController extends Controller {
     private function companyValidator($request){
-        $validator = Validator::make($request->all(), [
-            'nome' => 'required|max:255',
-            'email' => 'required|email',
-            'cpf' => 'required|max:14|min:14'
-        ]);
-        return $validator;
+      $validator = Validator::make($request->all(), [
+        'nome' => 'required|max:255',
+        'sobrenome' => 'required|max:255',
+        'email' => 'required|email',
+        'cpf' => 'required|max:14|min:14',
+        'telefone' => 'required|array',
+        'telefone.codigo_area' => 'string|min:2|max:2',
+        'telefone.numero' => 'string|regex:/^[0-9]{1} [0-9]{4}-[0-9]{4}/i',
+      ]);
+      return $validator;
     }
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $validator = $this->companyValidator($request);
         if($validator->fails() ) {
-            return response()->json([
-                'message' => 'Validation Failed',
-                'errors'  => $validator->errors()
-            ], 422);
+          return response()->json([
+            'message' => 'Validation Failed',
+            'errors'  => $validator->errors()
+          ], 422);
         }
-        $inputs = $request->all();
-        $inputs['numero'] = $request->phone['numero'];
-        $inputs['codigo_area'] = '2121';
+        try {
+          DB::beginTransaction();
 
-        # cadastro telefone
-        $telefone = Telefone::create($inputs);
-        $inputs['id_telefone'] = $telefone->id;
-        # cadastro pessoa
-        $pessoa = Pessoa::create($inputs);
-        # cadastro cooperado
-        $inputs['id_pessoa'] = $pessoa->id;
-        $cooperado= Cooperado::create($inputs);
+          $inputs = $request->all();
+          $inputs['numero'] = $request->telefone['numero'];
+          $inputs['codigo_area'] = $request->telefone['codigo_area'];
+          $inputs['status'] = true;
+
+          # cadastro telefone
+          $telefone = Telefone::create($inputs);
+          $inputs['id_telefone'] = $telefone->id;
+
+          # cadastro pessoa
+          $pessoa = Pessoa::create($inputs);
+
+          # cadastro cooperado
+          $inputs['id_pessoa'] = $pessoa->id;
+          $cooperado= Cooperado::create($inputs);
+
+          #cadastro de propriedades
+
+          foreach ($inputs['propriedades'] as $key => $value) {
+            $inputs['propriedades'][$key]['id_cooperado'] = $cooperado->id;
+
+            Propriedade::create($inputs['propriedades'][$key]);
+          }
 
 
+          DB::commit();
+        }catch (Exception $e) {
+          DB::rollback();
+
+          return response()->json([
+            'status' => 'error',
+            'errors' => $e->getMessages()
+          ], 500);
+        }
+        return response()->json(['status' => 'success']);
     }
     public function findAll(){
         return Cooperado::select('cooperado.id','p.nome as nome_cooperado' , 'p.cpf as cpf_cooperado',)
