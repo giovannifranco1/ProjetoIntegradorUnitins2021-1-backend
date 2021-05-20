@@ -35,8 +35,13 @@ Route::group([
 
 });
 #Rotas Tecnico
-Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
 Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll');
+Route::get('tecnico/data/{id}', 'App\Http\Controllers\TecnicoController@findById');
+Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
+Route::put('tecnico/{id}', 'App\Http\Controllers\TecnicoController@update');
+Route::put('tecnico/{id}/disable', 'App\Http\Controllers\TecnicoController@disable');
+Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable');
+// Route::put('tecnico/{id}/change_password', 'App\Http\Controllers\TecnicoController@changePassword');
 
 #Rotas Cooperado
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
