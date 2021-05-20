@@ -1,23 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Autenticacao;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-
-
 
 class RoleController extends Controller
 {
   public function __construct()
   {
-    $this->middleware('permission:Autenticação');
   }
-
+  private function companyValidator($request)
+  {
+    $validator = Validator::make($request->all(), [
+      'nome' => 'required',
+    ]);
+    return $validator;
+  }
   /**
    * Display a listing of the resource.
    *
@@ -25,8 +29,7 @@ class RoleController extends Controller
    */
   public function index()
   {
-    $roles = Role::all();
-    return response()->json(compact('roles'));
+    return response()->json(Role::all());
   }
 
   /**
@@ -37,16 +40,24 @@ class RoleController extends Controller
    */
   public function store(Request $request)
   {
-    $data = $request->all();
+    $validator = $this->companyValidator($request);
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validation Failed',
+        'errors'  => $validator->errors()
+      ], 422);
+    }
+    $data['name'] = $request->nome;
     try {
       DB::beginTransaction();
       Role::create($data);
       DB::commit();
     } catch (Exception $e) {
+      dd($e);
       DB::rollBack();
       return response()->json(['message' => 'Erro ao cadastrar'], 400);
     }
-    return response()->json(['message' => 'Editado com sucesso!']);
+    return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
   /**
    * Update the specified resource in storage.
@@ -57,7 +68,15 @@ class RoleController extends Controller
    */
   public function update(Request $request, $id)
   {
-    $data = $request->all();
+    $validator = $this->companyValidator($request);
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validation Failed',
+        'errors'  => $validator->errors()
+      ], 422);
+    }
+
+    $data['name'] = $request->nome;
     $role = Role::find($id);
     try {
       DB::beginTransaction();
@@ -78,10 +97,16 @@ class RoleController extends Controller
    */
   public function destroy($id)
   {
-    //
     $role = Role::find($id);
-    $role->delete();
-    return redirect()->route('role.index')->with('status', 'Perfil Removido com Sucesso!');
+    try {
+      DB::beginTransaction();
+      $role->delete();
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollBack();
+      return response()->json(['message' => 'Erro ao Remover'], 400);
+    }
+    return response()->json(['message' => 'Removido com sucesso!']);
   }
 
   public function permissions($role)

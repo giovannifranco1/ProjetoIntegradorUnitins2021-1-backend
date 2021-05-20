@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Visita extends Model
 {
-    use HasFactory;
-    protected $table = "visita";
+  use HasFactory;
+  protected $table = "visita";
 }
