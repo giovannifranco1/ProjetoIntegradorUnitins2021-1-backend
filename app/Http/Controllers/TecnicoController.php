@@ -13,10 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
-class TecnicoController extends Controller
-{
-  private function companyValidator($request)
-  {
+class TecnicoController extends Controller {
+  private function companyValidator($request) {
     $validator = Validator::make($request->all(), [
       'nome' => 'required|max:255',
       'email' => 'required|email|unique:users',
@@ -27,12 +25,20 @@ class TecnicoController extends Controller
     ]);
     return $validator;
   }
-  public function __construct()
-  {
+
+  private function validateUpdate($request) {
+    return Validator::make($request->all(), [
+      'nome' => 'required|max:255',
+      'email' => 'required|email',
+      'sobrenome' => 'required',
+      'cpf' => 'required|max:14|min:14',
+      'numero_registro' => 'required'
+    ]);
+  }
+  public function __construct() {
     //
   }
-  private function rolesSync(Request $request, $tecnico)
-  {
+  private function rolesSync(Request $request, $tecnico) {
     $rolesRequest = $request->except(['_token', '_method']);
     foreach ($rolesRequest as $key => $value) {
       $roles[] = Role::where('id', $key)->first();
@@ -45,8 +51,7 @@ class TecnicoController extends Controller
     }
     return $tecnico->id;
   }
-  public function store(Request $request)
-  {
+  public function store(Request $request) {
     $validator = $this->companyValidator($request);
     if ($validator->fails()) {
       return response()->json([
@@ -83,13 +88,7 @@ class TecnicoController extends Controller
     }
   }
   public function update(Request $request, $id) {
-    $validator = Validator::make($request->all(), [
-      'nome' => 'required|max:255',
-      'email' => 'required|email',
-      'sobrenome' => 'required',
-      'cpf' => 'required|max:14|min:14',
-      'numero_registro' => 'required'
-    ]);
+    $validator = validateUpdate($request);
 
     if ($validator->fails()) {
       return response()->json([

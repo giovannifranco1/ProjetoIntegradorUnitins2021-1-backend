@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cooperado extends Model
 {
-    protected $fillable  = ['id_pessoa'];
+    protected $fillable  = ['id_pessoa', 'status'];
     protected $table = 'cooperado';
 
     public function pessoa(){
-        return $this->belongsTo(Pessoa::class);
+      return $this->belongsTo(Pessoa::class);
     }
 }

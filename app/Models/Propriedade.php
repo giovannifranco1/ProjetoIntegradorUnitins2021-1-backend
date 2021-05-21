@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Propriedade extends Model
 {
-    use HasFactory;
+  protected $fillable  = ['nome', 'localidade', 'tamanho_area', 'matricula', 'id_cooperado','id_tecnico'];
+  protected $table = 'propriedade';
+  use HasFactory;
 }
