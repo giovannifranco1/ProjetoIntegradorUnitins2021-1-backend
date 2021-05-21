@@ -76,11 +76,6 @@ class CooperadoController extends Controller {
       ->get();
   }
   public function findById($id) {
-    #cooperado - id, status ok
-    #pessoa - nome, sobrenome, email, cpf ok
-    #telefone - number ok
-    #propriedade - nome, tamanho, localidade, matricula, tecnico_responsavel ok
-    #tecnico - id, nome ok
     $propriedades = Propriedade::where('id_cooperado', $id)->get();
 
     $cooperado = Cooperado::select(
