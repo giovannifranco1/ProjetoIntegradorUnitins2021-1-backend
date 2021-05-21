@@ -67,7 +67,7 @@ class TecnicoController extends Controller
       $inputs['name'] = $request->nome;
       $inputs['password'] = bcrypt($request->senha);
       $user = User::create($inputs);
-
+      $user->roles()->attach($request->id_grupo);
       //cadastro tecnico
       $inputs = $request->except('id_grupo', 'telefone','password');
       $inputs['id_telefone'] = $telefone->id;
@@ -76,7 +76,10 @@ class TecnicoController extends Controller
       DB::commit();
     }catch (Exception $e) {
       DB::rollback();
-      return response()->json(['message' => 'Erro ao cadastrar'], 500);
+      return response()->json([
+        'message' => 'Erro ao cadastrar',
+        'errors' => [$e->getMessage()]
+      ], 500);
     }
     if ($telefone && $tecnico) {
       return response()->json(['message' => 'success']);
@@ -111,11 +114,14 @@ class TecnicoController extends Controller
       $tecnico->update($data);
       $phone->update($data);
       $user->update($data);
-
+      $user->roles()->sync($request->id_grupo);
       DB::commit();
     }catch (Exception $e) {
       DB::rollback();
-      return response()->json(['message' => 'Não foi possível alterar os dados.'], 500);
+      return response()->json([
+        'message' => 'Não foi possível alterar os dados.',
+        'errors' => $e->getMessage()
+      ], 500);
     }
     return response()->json(['message' => 'success']);
   }
@@ -128,7 +134,18 @@ class TecnicoController extends Controller
     )->get();
   }
   public function findById($id) {
-    return Tecnico::select(
+    $user = User::select('users.*')
+    ->with(['roles' => function($r) {
+      $roles = [];
+      foreach($r->get(['id']) as $value){
+        $roles[] = $value->id;
+      }
+      $r = $roles;
+    }])
+    ->where('t.id', $id)
+    ->join('tecnico as t', 't.id_user', 'users.id')
+    ->first();
+    $tecnico = Tecnico::select(
       'tecnico.id',
       'tecnico.nome',
       'tecnico.sobrenome',
@@ -142,6 +159,8 @@ class TecnicoController extends Controller
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
     ->first();
+    return response()->json(compact('user', 'tecnico'));
+
   }
   private function setStatus(bool $status, $id) {
     try {

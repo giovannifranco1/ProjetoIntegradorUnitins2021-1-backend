@@ -19,7 +19,6 @@ class VisitaController extends Controller
       'id_propriedade' => 'required',
       'motivo_visita' => 'required'
     ]);
-
     return $validator;
   }
   public function findById($id)
