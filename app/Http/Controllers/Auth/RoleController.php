@@ -1,23 +1,29 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Autenticacao;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Exception;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-
-
 
 class RoleController extends Controller
 {
   public function __construct()
   {
-    $this->middleware('permission:Autenticação');
-  }
 
+  }
+  private function companyValidator($request)
+  {
+    $validator = Validator::make($request->all(), [
+      'nome' => 'required',
+    ]);
+    return $validator;
+  }
   /**
    * Display a listing of the resource.
    *
@@ -25,8 +31,12 @@ class RoleController extends Controller
    */
   public function index()
   {
-    $roles = Role::all();
-    return response()->json(compact('roles'));
+    $table = 'role_has_permissions';
+    $roles = DB::table($table)
+      ->select('permission_id as permission', 'r.name')
+      ->join('roles as r', 'r.id' , $table.'.role_id')
+      ->get();
+    return response()->json($roles);
   }
 
   /**
@@ -37,16 +47,25 @@ class RoleController extends Controller
    */
   public function store(Request $request)
   {
-    $data = $request->all();
+    $validator = $this->companyValidator($request);
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validation Failed',
+        'errors'  => $validator->errors()
+      ], 422);
+    }
+    $data['name'] = $request->nome;
     try {
       DB::beginTransaction();
-      Role::create($data);
+      $role = Role::create($data);
+      $role->permissions()->attach($request->permissions);
       DB::commit();
     } catch (Exception $e) {
+      dd($e);
       DB::rollBack();
       return response()->json(['message' => 'Erro ao cadastrar'], 400);
     }
-    return response()->json(['message' => 'Editado com sucesso!']);
+    return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
   /**
    * Update the specified resource in storage.
@@ -57,11 +76,21 @@ class RoleController extends Controller
    */
   public function update(Request $request, $id)
   {
-    $data = $request->all();
+
+    $validator = $this->companyValidator($request);
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'Validation Failed',
+        'errors'  => $validator->errors()
+      ], 422);
+    }
+
+    $data['name'] = $request->nome;
     $role = Role::find($id);
     try {
       DB::beginTransaction();
       $role->update($data);
+      $role->permissions()->sync($request->permissions);
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();
@@ -78,42 +107,38 @@ class RoleController extends Controller
    */
   public function destroy($id)
   {
-    //
     $role = Role::find($id);
-    $role->delete();
-    return redirect()->route('role.index')->with('status', 'Perfil Removido com Sucesso!');
+    try {
+      DB::beginTransaction();
+      $role->delete();
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollBack();
+      return response()->json(['message' => 'Erro ao Remover'], 400);
+    }
+    return response()->json(['message' => 'Removido com sucesso!']);
   }
 
   public function permissions($role)
   {
-
     $role = Role::where('id', $role)->first();
     $permissions = Permission::all();
 
     foreach ($permissions as $permission) {
-
-      if ($role->hasPermissionTo($permission->name)) {
-        $permission->can = true;
-      } else {
-        $permission->can = false;
-      }
+      $permission->can = $role->hasPermissionTo($permission->name);
     }
     return view('admin.autenticacao.roles.permissions', ['role' => $role, 'permissions' => $permissions]);
   }
-
-  public function permissionsSync(Request $request, $role)
-  {
-    $permissionsRequest = $request->except(['_token', '_method']);
-
-    foreach ($permissionsRequest as $key => $value) {
-      $permissions[] = Permission::where('id', $key)->first();
-    }
-    $role = Role::where('id', $role)->first();
-    if (!empty($permissions)) {
-      $role->syncPermissions($permissions);
-    } else {
-      $role->syncPermissions(null);
-    }
-    return redirect()->route('role.permissions', compact('role'))->with('status', 'Sincronizado');
+  public function findAll(){
+    $role = Role::select('roles.nome')
+    ->with(['permissions' => function($r) {
+      $permissions = [];
+      foreach($r->get(['id']) as $value){
+        $permissions[] = $value->id;
+      }
+      $r = $permissions;
+    }])
+    ->get();
+    dd($role);
   }
 }
