@@ -21,6 +21,8 @@ class RoleController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'nome' => 'required',
+      'permissoes' => 'array',
+      'permissoes.*' => 'integer'
     ]);
     return $validator;
   }
@@ -29,14 +31,22 @@ class RoleController extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function index()
-  {
+  public function index() {
     $table = 'role_has_permissions';
-    $roles = DB::table($table)
-      ->select('permission_id as permission', 'r.name')
-      ->join('roles as r', 'r.id' , $table.'.role_id')
-      ->get();
-    return response()->json($roles);
+
+    $roles = Role::select('id', 'name')->get();
+    $permissions = DB::table($table)->get();
+
+    $result = [];
+    foreach($roles as $r) {
+      $role = ['id' => $r->id, 'nome' => $r->name, 'permissoes' => []];
+      foreach($permissions as $p)
+        if ($p->role_id == $r->id)
+          $role['permissoes'][] = $p->permission_id;
+
+      $result[] = $role;
+    }
+    return response()->json($result);
   }
 
   /**
@@ -57,13 +67,17 @@ class RoleController extends Controller
     $data['name'] = $request->nome;
     try {
       DB::beginTransaction();
+
       $role = Role::create($data);
-      $role->permissions()->attach($request->permissions);
+      $role->permissions()->attach($request->permissoes);
+
       DB::commit();
     } catch (Exception $e) {
-      dd($e);
       DB::rollBack();
-      return response()->json(['message' => 'Erro ao cadastrar'], 400);
+      return response()->json([
+        'message' => 'fail',
+        'errors' => [$e->getMessage()]
+      ], 400);
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
@@ -90,7 +104,7 @@ class RoleController extends Controller
     try {
       DB::beginTransaction();
       $role->update($data);
-      $role->permissions()->sync($request->permissions);
+      $role->permissions()->sync($request->permissoes);
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();

@@ -35,9 +35,6 @@ class TecnicoController extends Controller {
       'numero_registro' => 'required'
     ]);
   }
-  public function __construct() {
-    //
-  }
   private function rolesSync(Request $request, $tecnico) {
     $rolesRequest = $request->except(['_token', '_method']);
     foreach ($rolesRequest as $key => $value) {
@@ -73,6 +70,7 @@ class TecnicoController extends Controller {
       $inputs['password'] = bcrypt($request->senha);
       $user = User::create($inputs);
       $user->roles()->attach($request->id_grupo);
+
       //cadastro tecnico
       $inputs = $request->except('id_grupo', 'telefone','password');
       $inputs['id_telefone'] = $telefone->id;
@@ -119,7 +117,7 @@ class TecnicoController extends Controller {
       DB::rollback();
       return response()->json([
         'message' => 'Não foi possível alterar os dados.',
-        'errors' => $e->getMessage()
+        'errors' => [$e->getMessage()]
       ], 500);
     }
     return response()->json(['message' => 'success']);
@@ -158,7 +156,7 @@ class TecnicoController extends Controller {
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
     ->first();
-    return response()->json(compact('user', 'tecnico'));
+    return response()->json($tecnico);
   }
   private function setStatus(bool $status, $id) {
     try {
@@ -173,7 +171,7 @@ class TecnicoController extends Controller {
       DB::rollback();
       return array('response' => [
         'message' => 'error',
-        'errors' => ['Não foi possível atualizar o status.']
+        'errors' => [$e->getMessage()]
       ], 'status' => 500);
     }
     return array('response' => ['message' => 'success'], 'status' => 200);
