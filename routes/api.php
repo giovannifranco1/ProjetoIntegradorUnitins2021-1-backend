@@ -42,9 +42,10 @@ Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable
 // Route::put('tecnico/{id}/change_password', 'App\Http\Controllers\TecnicoController@changePassword');
 
 #Rotas Cooperado
-Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
 Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
+Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
+Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
 
 #Rotas painel
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');

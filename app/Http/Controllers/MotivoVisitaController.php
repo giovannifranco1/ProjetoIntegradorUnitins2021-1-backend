@@ -9,10 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 class MotivoVisitaController extends Controller
 {
-  public function index()
-  {
-    $motivos_visita = MotivoVisita::get();
-    return response()->json(compact('motivos_visita'));
+  public function index() {
+    return response()->json(MotivoVisita::get());
   }
   public function store(Request $request)
   {
