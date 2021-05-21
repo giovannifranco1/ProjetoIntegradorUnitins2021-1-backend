@@ -44,6 +44,7 @@ Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable
 #Rotas Cooperado
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
+Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
 
 #Rotas painel
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');
