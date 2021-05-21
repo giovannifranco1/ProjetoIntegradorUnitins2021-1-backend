@@ -91,7 +91,7 @@ class TecnicoController extends Controller {
     }
   }
   public function update(Request $request, $id) {
-    $validator = validateUpdate($request);
+    $validator = $this->validateUpdate($request);
 
     if ($validator->fails()) {
       return response()->json([
@@ -159,7 +159,6 @@ class TecnicoController extends Controller {
     ->where('tecnico.id', $id)
     ->first();
     return response()->json(compact('user', 'tecnico'));
-
   }
   private function setStatus(bool $status, $id) {
     try {
