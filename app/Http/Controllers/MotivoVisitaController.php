@@ -17,14 +17,11 @@ class MotivoVisitaController extends Controller
     ]);
     return $validator;
   }
-  public function index()
-  {
-    $motivos_visita = MotivoVisita::get();
-    return response()->json(compact('motivos_visita'));
+  public function index() {
+    return response()->json(MotivoVisita::get());
   }
-  public function store(Request $request)
-  {
-    $validator = $this->companyValidator($request->all());
+  public function store(Request $request) {
+    $validator = $this->companyValidator($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
@@ -38,7 +35,10 @@ class MotivoVisitaController extends Controller
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();
-      return response()->json(['message' => 'Erro ao cadastrar'], 400);
+      return response()->json([
+        'message' => 'fail',
+        'errors' => [$e->getMessage()]
+      ], 500);
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
