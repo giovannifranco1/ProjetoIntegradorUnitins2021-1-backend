@@ -24,11 +24,10 @@ class AuthController extends Controller
   // Validator Method
   protected function companyValidator($request)
   {
-    $validator = Validator::make($request->all(), [
+    return Validator::make($request->all(), [
       'email' => 'required|email',
       'password' => 'required'
     ]);
-    return $validator;
   }
   /**
    * Get a JWT via given credentials.
@@ -44,7 +43,8 @@ class AuthController extends Controller
       ], 422);
     }
     $credentials = $request->all();
-    if (!$token = auth::attempt($credentials)) {
+    $token = auth::attempt($credentials);
+    if (!$token) {
       return response()->json(['error' => 'Unauthorized'], 401);
     }
     return $this->respondWithToken($token);
@@ -59,17 +59,6 @@ class AuthController extends Controller
     auth::logout();
     return response()->json(['message' => 'Successfully logged out']);
   }
-
-  /**
-   * Refresh a token.
-   *
-   * @return \Illuminate\Http\JsonResponse
-   */
-  public function refresh()
-  {
-    return $this->respondWithToken(auth::refresh());
-  }
-
   /**
    * Get the token array structure.
    *
@@ -79,13 +68,23 @@ class AuthController extends Controller
    */
   protected function respondWithToken($token)
   {
+    $user = User::select('name', 'id', 'email')->find(auth()->id());
+    $permissoes = User::select('name', 'id', 'email')
+      ->find(auth()->id())
+      ->getPermissionsViaRoles()
+      ->mapWithKeys(function($t){
+      return [
+        $t['id'] => $t['id']
+      ];
+    });
     return response()->json([
       'access_token' => $token,
       'token_type' => 'Bearer',
       'expires_in' => auth::factory()->getTTL() * 60,
       'user' => [
-        Auth::user()
-      ]
+          'usuario' => $user,
+          'permissoes' => $permissoes
+        ]
     ]);
   }
 }
