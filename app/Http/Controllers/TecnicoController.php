@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pessoa;
 use App\Models\Tecnico;
 use App\Models\Telefone;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
 
 class TecnicoController extends Controller {
+
+  public function __construct()
+  {
+    $this->middleware(['permission:gerenciar_tecnico']);
+  }
+
   private function companyValidator($request) {
     $validator = Validator::make($request->all(), [
       'nome' => 'required|max:255',
@@ -35,19 +39,19 @@ class TecnicoController extends Controller {
       'numero_registro' => 'required'
     ]);
   }
-  private function rolesSync(Request $request, $tecnico) {
-    $rolesRequest = $request->except(['_token', '_method']);
-    foreach ($rolesRequest as $key => $value) {
-      $roles[] = Role::where('id', $key)->first();
-    }
-    $tecnico = Tecnico::where('id', $tecnico)->first();
-    if (!empty($roles)) {
-      $tecnico->syncRoles($roles);
-    } else {
-      $tecnico->syncRoles(null);
-    }
-    return $tecnico->id;
-  }
+  // private function rolesSync(Request $request, $tecnico) {
+  //   $rolesRequest = $request->except(['_token', '_method']);
+  //   foreach ($rolesRequest as $key => $value) {
+  //     $roles[] = Role::where('id', $key)->first();
+  //   }
+  //   $tecnico = Tecnico::where('id', $tecnico)->first();
+  //   if (!empty($roles)) {
+  //     $tecnico->syncRoles($roles);
+  //   } else {
+  //     $tecnico->syncRoles(null);
+  //   }
+  //   return $tecnico->id;
+  // }
   public function store(Request $request) {
     $validator = $this->companyValidator($request);
     if ($validator->fails()) {
@@ -133,11 +137,7 @@ class TecnicoController extends Controller {
   public function findById($id) {
     $user = User::select('users.*')
     ->with(['roles' => function($r) {
-      $roles = [];
-      foreach($r->get(['id']) as $value){
-        $roles[] = $value->id;
-      }
-      $r = $roles;
+      $r->get(['id' , 'name']);
     }])
     ->where('t.id', $id)
     ->join('tecnico as t', 't.id_user', 'users.id')
@@ -156,16 +156,14 @@ class TecnicoController extends Controller {
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
     ->first();
+    $tecnico->grupos = $user->roles[0];
     return response()->json($tecnico);
   }
   private function setStatus(bool $status, $id) {
     try {
       DB::beginTransaction();
-
       $tecnico = Tecnico::find($id);
-
       $tecnico->update(['status' => $status]);
-
       DB::commit();
     } catch (Exception $e) {
       DB::rollback();
