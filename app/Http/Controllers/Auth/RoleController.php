@@ -11,12 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class RoleController extends Controller
-{
-  public function __construct()
-  {
-
-  }
+class RoleController extends Controller {
   private function companyValidator($request)
   {
     $validator = Validator::make($request->all(), [
@@ -88,10 +83,9 @@ class RoleController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $id)
-  {
-
+  public function update(Request $request, $id) {
     $validator = $this->companyValidator($request);
+
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
@@ -119,8 +113,7 @@ class RoleController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function destroy($id)
-  {
+  public function destroy($id) {
     $role = Role::find($id);
     try {
       DB::beginTransaction();
@@ -133,8 +126,7 @@ class RoleController extends Controller
     return response()->json(['message' => 'Removido com sucesso!']);
   }
 
-  public function permissions($role)
-  {
+  public function permissions($role) {
     $role = Role::where('id', $role)->first();
     $permissions = Permission::all();
 
@@ -143,7 +135,7 @@ class RoleController extends Controller
     }
     return view('admin.autenticacao.roles.permissions', ['role' => $role, 'permissions' => $permissions]);
   }
-  public function findAll(){
+  public function findAll() {
     $role = Role::select('roles.nome')
     ->with(['permissions' => function($r) {
       $permissions = [];
