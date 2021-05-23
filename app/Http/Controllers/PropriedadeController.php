@@ -2,74 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cooperado;
-use App\Models\Pessoa;
-use App\Models\Telefone;
 use App\Models\Propriedade;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CooperadoController extends Controller {
   private function companyValidator($request){
     $validator = Validator::make($request->all(), [
       'nome' => 'required|max:255',
-      'sobrenome' => 'required|max:255',
-      'email' => 'required|email',
-      'cpf' => 'required|max:14|min:14',
-      'telefone' => 'required|array',
-      'telefone.codigo_area' => 'string|min:2|max:2',
-      'telefone.numero' => 'string|regex:/^[0-9]{1} [0-9]{4}-[0-9]{4}/i'
+      'tamanho_area' => 'required|min',
+      'localidade' => 'required',
+      'matricula' => 'required',
+      'id_tecnico' => 'required'
     ]);
     return $validator;
   }
-  public function store(Request $request) {
+  public function create(Request $request, $cooperado) {
     $validator = $this->companyValidator($request);
 
-    if($validator->fails() ) {
+    if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
         'errors'  => $validator->errors()
       ], 422);
     }
 
+    $propriedade = $request->all();
+    $propriedade['id_cooperado'] = $cooperado;
+
     try {
-      DB::beginTransaction();
-
-      $inputs = $request->all();
-      $inputs['numero'] = $request->telefone['numero'];
-      $inputs['codigo_area'] = $request->telefone['codigo_area'];
-      $inputs['status'] = true;
-
-      # cadastro telefone
-      $telefone = Telefone::create($inputs);
-      $inputs['id_telefone'] = $telefone->id;
-
-      # cadastro pessoa
-      $pessoa = Pessoa::create($inputs);
-
-      # cadastro cooperado
-      $inputs['id_pessoa'] = $pessoa->id;
-      $cooperado= Cooperado::create($inputs);
-
-      #cadastro de propriedades
-      foreach ($inputs['propriedades'] as $key => $value) {
-        $inputs['propriedades'][$key]['id_cooperado'] = $cooperado->id;
-
-        Propriedade::create($inputs['propriedades'][$key]);
-      }
-
-      DB::commit();
-    }catch (Exception $e) {
-      DB::rollback();
-
+      Propriedade::create($propriedade);
+    } catch (Exception $e) {
       return response()->json([
-        'status' => 'error',
+        'message' => 'fail',
         'errors' => [$e->getMessage()]
       ], 500);
     }
-    return response()->json(['status' => 'success']);
+    return response()->json(['message' => 'success']);
   }
   public function update(Request $request, $id) {
     $validator = $this->companyValidator($request);
@@ -81,45 +51,39 @@ class CooperadoController extends Controller {
       ], 422);
     }
     try {
-      DB::beginTransaction();
-
       $data = $request->all();
-      $cooperado = Cooperado::find($id);
 
-      $cooperado->update($data);
-
-      DB::commit();
+      Propriedade::find($id)->update($data);
     } catch (Exception $e) {
-      DB::rollback();
       response()->json([
         'message' => 'fail',
         'errors' => [$e->getMessage()]
       ], 500);
     }
   }
-  public function findAll(){
-    return Cooperado::select('cooperado.id','p.nome as nome_cooperado' , 'p.cpf as cpf_cooperado',)
-      ->join('pessoa as p' ,'p.id', 'cooperado.id_pessoa')
-      ->get();
-  }
-  public function findById($id) {
-    $propriedades = Propriedade::where('id_cooperado', $id)->get();
+  public function transfer(Request $request, $id) {
+    $validator = Validator::make(
+      $request->all(),
+      ['cooperado' => 'required|integer']
+    );
 
-    $cooperado = Cooperado::select(
-      'cooperado.id',
-      'cooperado.status',
-      'p.nome',
-      'p.sobrenome',
-      'p.email',
-      'p.cpf',
-      DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
-    )
-    ->join('pessoa as p', 'p.id', 'cooperado.id_pessoa')
-    ->join('telefone as t', 't.id', 'p.id_telefone')
-    ->first();
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'fail',
+        'errors' => $validator->errors()
+      ]);
+    }
 
-    $cooperado['propriedades'] = $propriedades;
+    $cooperado = $request->cooperado;
 
-    return response()->json($cooperado);
+    try {
+      Propriedade::find($id)->update(['id_cooperado' => $cooperado]);
+    } catch (Exception $e) {
+      return response()->json([
+        'message' => 'fail',
+        'errors' => [$e->getMessage()]
+      ], 500);
+    }
+    return response()->json(['message' => 'success']);
   }
 }

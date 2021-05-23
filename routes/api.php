@@ -47,7 +47,10 @@ Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
 Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
+Route::post('cooperado/{cooperado}/propriedade', 'App\Http\Controllers\PropriedadeController@create');
 Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
+Route::put('propriedade/{id}', 'App\Http\Controllers\PropriedadeController@update');
+Route::put('propriedade/{id}/transfer', 'App\Http\Controllers\PropriedadeController@transfer');
 
 #Rotas painel
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');

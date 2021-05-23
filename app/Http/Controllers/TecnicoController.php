@@ -162,8 +162,7 @@ class TecnicoController extends Controller {
   private function setStatus(bool $status, $id) {
     try {
       DB::beginTransaction();
-      $tecnico = Tecnico::find($id);
-      $tecnico->update(['status' => $status]);
+      Tecnico::find($id)->update(['status' => $status]);
       DB::commit();
     } catch (Exception $e) {
       DB::rollback();
