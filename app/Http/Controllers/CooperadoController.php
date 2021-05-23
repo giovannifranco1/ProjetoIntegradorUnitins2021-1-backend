@@ -122,4 +122,28 @@ class CooperadoController extends Controller {
 
     return response()->json($cooperado);
   }
+  private function setStatus(bool $status, $id) {
+    try {
+      DB::beginTransaction();
+
+      Cooperado::find($id)->update(['status' => $status]);
+
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollback();
+      return array('response' => [
+        'message' => 'error',
+        'errors' => [$e->getMessage()]
+      ], 'status' => 500);
+    }
+    return array('response' => ['message' => 'success'], 'status' => 200);
+  }
+  public function disable($id) {
+    $result = $this->setStatus(false, $id);
+    return response()->json($result['response'], $result['status']);
+  }
+  public function enable($id) {
+    $result = $this->setStatus(true, $id);
+    return response()->json($result['response'], $result['status']);
+  }
 }

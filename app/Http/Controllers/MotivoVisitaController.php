@@ -42,9 +42,9 @@ class MotivoVisitaController extends Controller
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
-  public function update(Request $request, $id)
-  {
-    $validator = $this->companyValidator($request->all());
+  public function update(Request $request, $id) {
+    $validator = $this->companyValidator($request);
+
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
@@ -66,10 +66,11 @@ class MotivoVisitaController extends Controller
   }
   public function destroy($id)
   {
-    $motivos_visita = MotivoVisita::find($id);
     try {
       DB::beginTransaction();
-      $motivos_visita->delete();
+
+      MotivoVisita::find($id)->delete();
+      
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();
