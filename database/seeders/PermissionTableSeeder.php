@@ -9,13 +9,13 @@ use Spatie\Permission\Models\Permission;
 class PermissionTableSeeder extends Seeder
 {
     private static $permissions = array(
-        array("name" => "gerenciar-visita", "guard_name" => "web"),
-        array("name" => "gerenciar-cooperado", "guard_name" => "web"),
-        array("name" => "gerenciar-tecnico", "guard_name" => "web"),
-        array("name" => "gerenciar-grupos", "guard_name" => "web"),
-        array("name" => "gerenciar-motivos", "guard_name" => "web"),
-        array("name" => "gerar-relatorios", "guard_name" => "web"),
-        array("name" => "gerenciar-propriedade", "guard_name" => "web")
+        array("name" => "gerenciar_visita", "guard_name" => "api"),
+        array("name" => "gerenciar_cooperado", "guard_name" => "api"),
+        array("name" => "gerenciar_tecnico", "guard_name" => "api"),
+        array("name" => "gerenciar_grupos", "guard_name" => "api"),
+        array("name" => "gerenciar_motivos", "guard_name" => "api"),
+        array("name" => "gerar_relatorios", "guard_name" => "api"),
+        array("name" => "gerenciar_propriedade", "guard_name" => "api")
     );
 
     /**

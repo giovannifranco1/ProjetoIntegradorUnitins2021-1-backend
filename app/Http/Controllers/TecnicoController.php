@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pessoa;
 use App\Models\Tecnico;
 use App\Models\Telefone;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
 
-class TecnicoController extends Controller
-{
-  private function companyValidator($request)
+class TecnicoController extends Controller {
+
+  public function __construct()
   {
+    $this->middleware('permission:gerenciar_tecnico');
+  }
+
+  private function companyValidator($request) {
     $validator = Validator::make($request->all(), [
       'nome' => 'required|max:255',
       'email' => 'required|email|unique:users',
@@ -27,26 +29,30 @@ class TecnicoController extends Controller
     ]);
     return $validator;
   }
-  public function __construct()
-  {
-    //
+
+  private function validateUpdate($request) {
+    return Validator::make($request->all(), [
+      'nome' => 'required|max:255',
+      'email' => 'required|email',
+      'sobrenome' => 'required',
+      'cpf' => 'required|max:14|min:14',
+      'numero_registro' => 'required'
+    ]);
   }
-  private function rolesSync(Request $request, $tecnico)
-  {
-    $rolesRequest = $request->except(['_token', '_method']);
-    foreach ($rolesRequest as $key => $value) {
-      $roles[] = Role::where('id', $key)->first();
-    }
-    $tecnico = Tecnico::where('id', $tecnico)->first();
-    if (!empty($roles)) {
-      $tecnico->syncRoles($roles);
-    } else {
-      $tecnico->syncRoles(null);
-    }
-    return $tecnico->id;
-  }
-  public function store(Request $request)
-  {
+  // private function rolesSync(Request $request, $tecnico) {
+  //   $rolesRequest = $request->except(['_token', '_method']);
+  //   foreach ($rolesRequest as $key => $value) {
+  //     $roles[] = Role::where('id', $key)->first();
+  //   }
+  //   $tecnico = Tecnico::where('id', $tecnico)->first();
+  //   if (!empty($roles)) {
+  //     $tecnico->syncRoles($roles);
+  //   } else {
+  //     $tecnico->syncRoles(null);
+  //   }
+  //   return $tecnico->id;
+  // }
+  public function store(Request $request) {
     $validator = $this->companyValidator($request);
     if ($validator->fails()) {
       return response()->json([
@@ -67,6 +73,7 @@ class TecnicoController extends Controller
       $inputs['name'] = $request->nome;
       $inputs['password'] = bcrypt($request->senha);
       $user = User::create($inputs);
+      $user->roles()->attach($request->id_grupo);
 
       //cadastro tecnico
       $inputs = $request->except('id_grupo', 'telefone','password');
@@ -76,20 +83,17 @@ class TecnicoController extends Controller
       DB::commit();
     }catch (Exception $e) {
       DB::rollback();
-      return response()->json(['message' => 'Erro ao cadastrar'], 500);
+      return response()->json([
+        'message' => 'Erro ao cadastrar',
+        'errors' => [$e->getMessage()]
+      ], 500);
     }
     if ($telefone && $tecnico) {
       return response()->json(['message' => 'success']);
     }
   }
   public function update(Request $request, $id) {
-    $validator = Validator::make($request->all(), [
-      'nome' => 'required|max:255',
-      'email' => 'required|email',
-      'sobrenome' => 'required',
-      'cpf' => 'required|max:14|min:14',
-      'numero_registro' => 'required'
-    ]);
+    $validator = $this->validateUpdate($request);
 
     if ($validator->fails()) {
       return response()->json([
@@ -111,11 +115,14 @@ class TecnicoController extends Controller
       $tecnico->update($data);
       $phone->update($data);
       $user->update($data);
-
+      $user->roles()->sync($request->id_grupo);
       DB::commit();
     }catch (Exception $e) {
       DB::rollback();
-      return response()->json(['message' => 'Não foi possível alterar os dados.'], 500);
+      return response()->json([
+        'message' => 'Não foi possível alterar os dados.',
+        'errors' => [$e->getMessage()]
+      ], 500);
     }
     return response()->json(['message' => 'success']);
   }
@@ -128,7 +135,14 @@ class TecnicoController extends Controller
     )->get();
   }
   public function findById($id) {
-    return Tecnico::select(
+    $user = User::select('users.*')
+    ->with(['roles' => function($r) {
+      $r->get(['id' , 'name']);
+    }])
+    ->where('t.id', $id)
+    ->join('tecnico as t', 't.id_user', 'users.id')
+    ->first();
+    $tecnico = Tecnico::select(
       'tecnico.id',
       'tecnico.nome',
       'tecnico.sobrenome',
@@ -142,21 +156,19 @@ class TecnicoController extends Controller
     ->join('telefone as t', 't.id', 'tecnico.id_telefone')
     ->where('tecnico.id', $id)
     ->first();
+    $tecnico->grupos = $user->roles[0];
+    return response()->json($tecnico);
   }
   private function setStatus(bool $status, $id) {
     try {
       DB::beginTransaction();
-
-      $tecnico = Tecnico::find($id);
-
-      $tecnico->update(['status' => $status]);
-
+      Tecnico::find($id)->update(['status' => $status]);
       DB::commit();
     } catch (Exception $e) {
       DB::rollback();
       return array('response' => [
         'message' => 'error',
-        'errors' => ['Não foi possível atualizar o status.']
+        'errors' => [$e->getMessage()]
       ], 'status' => 500);
     }
     return array('response' => ['message' => 'success'], 'status' => 200);

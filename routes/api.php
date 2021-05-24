@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\RoleController as AuthRoleController;
+use App\Http\Controllers\Auth\RoleController\RoleController;
 use App\Models\MotivoVisita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,8 +44,13 @@ Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable
 // Route::put('tecnico/{id}/change_password', 'App\Http\Controllers\TecnicoController@changePassword');
 
 #Rotas Cooperado
-Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
+Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
+Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
+Route::post('cooperado/{cooperado}/propriedade', 'App\Http\Controllers\PropriedadeController@create');
+Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
+Route::put('propriedade/{id}', 'App\Http\Controllers\PropriedadeController@update');
+Route::put('propriedade/{id}/transfer', 'App\Http\Controllers\PropriedadeController@transfer');
 
 #Rotas painel
 Route::get('painel' , 'App\Http\Controllers\PainelController@index');
@@ -53,3 +60,15 @@ Route::get('motivos', 'App\Http\Controllers\MotivoVisitaController@index');
 Route::post('motivos', 'App\Http\Controllers\MotivoVisitaController@store');
 Route::put('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@update');
 Route::delete('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@destroy');
+
+#Rotas Visita
+Route::get('visitas/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
+Route::put('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
+Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
+
+#Rotas Roles
+Route::get('grupos', 'App\Http\Controllers\Auth\RoleController@index');
+Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');
+Route::put('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@update');
+Route::delete('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@destroy');

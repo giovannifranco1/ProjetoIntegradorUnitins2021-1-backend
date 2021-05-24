@@ -23,5 +23,6 @@ class PainelController extends Controller
             ->orderBy('visita.dia_visita' , 'desc')
             ->get();
         return response()->json($visita);
+
     }
 }
