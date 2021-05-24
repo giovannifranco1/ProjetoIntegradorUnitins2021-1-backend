@@ -15,7 +15,7 @@ class TecnicoController extends Controller {
 
   public function __construct()
   {
-    $this->middleware(['permission:gerenciar_tecnico']);
+    $this->middleware('permission:gerenciar_tecnico');
   }
 
   private function companyValidator($request) {
