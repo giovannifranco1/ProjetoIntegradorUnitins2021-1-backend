@@ -81,30 +81,28 @@ class CooperadoController extends Controller {
       ], 422);
     }
     try {
-      DB::beginTransaction();
-
       $data = $request->all();
+
       $cooperado = Cooperado::find($id);
 
-      $cooperado->update($data);
-
-      DB::commit();
+      $pessoa = Pessoa::find($cooperado->id_pessoa);
+      $pessoa->update($data);
     } catch (Exception $e) {
-      DB::rollback();
       response()->json([
         'message' => 'fail',
         'errors' => [$e->getMessage()]
       ], 500);
     }
+    return response()->json([
+      'message' => 'success'
+    ]);
   }
   public function findAll(){
-    return Cooperado::select('cooperado.id','p.nome as nome_cooperado' , 'p.cpf as cpf_cooperado',)
+    return Cooperado::select('cooperado.id','p.nome as nome_cooperado', 'cooperado.status' , 'p.cpf as cpf_cooperado',)
       ->join('pessoa as p' ,'p.id', 'cooperado.id_pessoa')
       ->get();
   }
   public function findById($id) {
-    $propriedades = Propriedade::where('id_cooperado', $id)->get();
-
     $cooperado = Cooperado::select(
       'cooperado.id',
       'cooperado.status',
@@ -116,21 +114,14 @@ class CooperadoController extends Controller {
     )
     ->join('pessoa as p', 'p.id', 'cooperado.id_pessoa')
     ->join('telefone as t', 't.id', 'p.id_telefone')
-    ->first();
-
-    $cooperado['propriedades'] = $propriedades;
+    ->find($id);
 
     return response()->json($cooperado);
   }
   private function setStatus(bool $status, $id) {
     try {
-      DB::beginTransaction();
-
       Cooperado::find($id)->update(['status' => $status]);
-
-      DB::commit();
     } catch (Exception $e) {
-      DB::rollback();
       return array('response' => [
         'message' => 'error',
         'errors' => [$e->getMessage()]

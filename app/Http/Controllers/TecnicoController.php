@@ -24,7 +24,7 @@ class TecnicoController extends Controller {
       'email' => 'required|email|unique:users',
       'senha' => 'required|min:8',
       'sobrenome' => 'required',
-      'cpf' => 'required|max:14|min:14',
+      'cpf' => 'required|max:14|min:14|unique:tecnico,cpf',
       'numero_registro' => 'required',
     ]);
     return $validator;
@@ -151,12 +151,13 @@ class TecnicoController extends Controller {
       'u.email',
       'tecnico.numero_registro',
       DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
-    )
-    ->join('users as u', 'u.id', 'tecnico.id_user')
-    ->join('telefone as t', 't.id', 'tecnico.id_telefone')
-    ->where('tecnico.id', $id)
-    ->first();
-    $tecnico->grupos = $user->roles[0];
+      )
+      ->join('users as u', 'u.id', 'tecnico.id_user')
+      ->join('telefone as t', 't.id', 'tecnico.id_telefone')
+      ->find($id);
+
+    if (sizeOf($user->roles) > 0) $tecnico->grupo = $user->roles[0];
+
     return response()->json($tecnico);
   }
   private function setStatus(bool $status, $id) {
