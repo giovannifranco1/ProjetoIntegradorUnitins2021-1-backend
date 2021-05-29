@@ -48,6 +48,8 @@ Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll'
 Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
+Route::put('cooperado/{id}/disable', 'App\Http\Controllers\CooperadoController@disable');
+Route::put('cooperado/{id}/enable', 'App\Http\Controllers\CooperadoController@enable');
 
 #Propriedade
 Route::get('propriedades/{cooperado}', 'App\Http\Controllers\PropriedadeController@findByCooperado');
