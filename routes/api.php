@@ -67,7 +67,8 @@ Route::put('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@upda
 Route::delete('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@destroy');
 
 #Rotas Visita
-Route::get('visitas/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::get('visita/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTecnico');
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
 Route::put('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');

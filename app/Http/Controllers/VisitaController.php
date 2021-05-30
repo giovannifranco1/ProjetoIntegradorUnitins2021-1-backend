@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Visita;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,24 +14,34 @@ class VisitaController extends Controller
   private function companyValidator($request)
   {
     $validator = Validator::make($request->all(), [
-      'horario_estimado_visita' => 'required|datetime',
+      'horaEstimada' => 'required|date',
       'dia_visita' => 'required|date',
       'id_tecnico' => 'required',
       'id_propriedade' => 'required',
-      'motivo_visita' => 'required'
+      'motivo_visita' => 'required|string'
     ]);
     return $validator;
   }
   public function findById($id)
   {
-    $visita = Visita::select('p_c.nome as nome_cooperado', 'propriedade.nome as nome_propriedade', 'visita.*')
-      ->join('propriedade', 'propriedade.id', 'visita.id_propriedade')
-      ->join('cooperado as c', 'c.id', 'propriedade.id_cooperado')
-      ->join('pessoa as p_c', 'p_c.id', 'c.id_pessoa')
-      ->where('p_c.id', "%{$id}%")
-      ->orderBy('visita.dia_visita', 'desc')
-      ->get();
+    $visita = Visita::select('visita.*', 'p.nome as cooperado', 'pr.nome as propriedade')
+      ->join('propriedade as pr', 'pr.id', 'visita.id_propriedade')
+      ->join('cooperado as c', 'c.id', 'pr.id_cooperado')
+      ->join('pessoa as p', 'p.id', 'c.id_pessoa')
+      ->where('visita.id', $id)
+      ->first();
+
     return response()->json($visita);
+  }
+
+  public function findByTecnico($id) {
+    $visitas = Visita::select('visita.*', 'p.nome as propriedade')
+      ->join('tecnico as t', 't.id', 'visita.id_tecnico')
+      ->join('propriedade as p', 'p.id', 'visita.id_propriedade')
+      ->where('t.id', $id)
+      ->get();
+
+    return response()->json($visitas);
   }
 
   public function store(Request $request)
@@ -44,13 +55,18 @@ class VisitaController extends Controller
     }
 
     $data = $request->all();
+    $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
+
     try {
       DB::beginTransaction();
       Visita::create($data);
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();
-      return response()->json(['message' => 'Erro ao cadastrar'], 400);
+      return response()->json([
+        'message' => 'fail',
+        'errors' => [$e->getMessage()]
+      ], 400);
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
