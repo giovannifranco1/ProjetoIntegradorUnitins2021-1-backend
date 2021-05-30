@@ -18,7 +18,7 @@ class AuthController extends Controller
    */
   public function __construct()
   {
-    $this->middleware('auth:api', ['except' => ['login']]);
+    $this->middleware('auth:api', ['except' => ['login', 'validateToken']]);
   }
 
   // Validator Method
@@ -58,6 +58,12 @@ class AuthController extends Controller
   {
     auth::logout();
     return response()->json(['message' => 'Successfully logged out']);
+  }
+
+  public function validateToken() {
+    return response()->json([
+      'isValid' => auth()->check()
+    ]);
   }
   /**
    * Get the token array structure.
