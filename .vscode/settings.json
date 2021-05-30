@@ -1,10 +1,5 @@
 {
   "cSpell.ignoreWords": [
-    "relatorio",
-    "select",
-    "start",
-    "tecnico",
-    "validate",
     "area",
     "arya",
     "browserslist",
@@ -19,6 +14,7 @@
     "formik",
     "historico",
     "horario",
+    "observacao",
     "observacoes",
     "painel",
     "permissoes",
@@ -27,13 +23,15 @@
     "primereact",
     "propriedade",
     "relatorio",
+    "select",
+    "start",
     "tecn",
     "tecnico",
     "tecnicos",
     "unform",
+    "validate",
     "visita",
-    "visitas",
-    "permissoes"
+    "visitas"
   ],
   "cSpell.words": [
     "daygrid",
