@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tecnico;
 use App\Models\Visita;
 use DateTime;
 use Exception;
@@ -16,7 +17,7 @@ class VisitaController extends Controller
     $validator = Validator::make($request->all(), [
       'horaEstimada' => 'required|date',
       'dia_visita' => 'required|date',
-      'id_tecnico' => 'required',
+      'id_user' => 'required',
       'id_propriedade' => 'required',
       'motivo_visita' => 'required|string'
     ]);
@@ -36,9 +37,10 @@ class VisitaController extends Controller
 
   public function findByTecnico($id) {
     $visitas = Visita::select('visita.*', 'p.nome as propriedade')
-      ->join('tecnico as t', 't.id', 'visita.id_tecnico')
       ->join('propriedade as p', 'p.id', 'visita.id_propriedade')
-      ->where('t.id', $id)
+      ->join('tecnico as t', 't.id', 'visita.id_tecnico')
+      ->join('users as u', 'u.id', 't.id_user')
+      ->where('u.id', $id)
       ->get();
 
     return response()->json($visitas);
@@ -59,6 +61,10 @@ class VisitaController extends Controller
 
     try {
       DB::beginTransaction();
+      $tecnico = Tecnico::select('id')
+        ->where('id_user', $request->id_user)
+        ->first();
+      $data['id_tecnico'] = $tecnico->id;
       Visita::create($data);
       DB::commit();
     } catch (Exception $e) {

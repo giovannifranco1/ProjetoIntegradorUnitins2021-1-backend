@@ -75,6 +75,7 @@ class AuthController extends Controller
   protected function respondWithToken($token)
   {
     $user = User::select('name', 'id', 'email')->find(auth()->id());
+
     $permissoes = User::select('name', 'id', 'email')
       ->find(auth()->id())
       ->getPermissionsViaRoles()
@@ -88,9 +89,9 @@ class AuthController extends Controller
       'token_type' => 'Bearer',
       'expires_in' => auth::factory()->getTTL() * 60,
       'usuario' => [
-          'data' => $user,
-          'permissoes' => $permissoes
-        ]
+        'data' => $user,
+        'permissoes' => $permissoes
+      ]
     ]);
   }
 }
