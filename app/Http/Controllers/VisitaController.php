@@ -101,10 +101,14 @@ class VisitaController extends Controller
         'errors'  => $validator->errors()
       ], 422);
     }
+    
     $data = $request->all();
-    $visita = Visita::find($id);
+    $data['dia_visita'] = new DateTime($data['dia_visita']);
+    $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
+
     try {
       DB::beginTransaction();
+      $visita = Visita::find($id);
       $visita->update($data);
       DB::commit();
     } catch (Exception $e) {
