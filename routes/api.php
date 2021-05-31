@@ -66,9 +66,8 @@ Route::delete('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@d
 Route::get('visita/{visita}', 'App\Http\Controllers\VisitaController@findById');
 Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTecnico');
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
-Route::put('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
+Route::post('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
-Route::put('visitas/image/{visita}', 'App\Http\Controllers\VisitaController@imageStore');
 #Rotas Roles
 Route::get('grupos', 'App\Http\Controllers\Auth\RoleController@index');
 Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');
