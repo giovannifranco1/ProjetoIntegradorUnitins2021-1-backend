@@ -7,24 +7,27 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CooperadoController extends Controller {
-  private function companyValidator($request){
+class CooperadoController extends Controller
+{
+  private function companyValidator($request)
+  {
     $validator = Validator::make($request->all(), [
       'nome' => 'required|max:255',
       'tamanho_area' => 'required|min',
       'localidade' => 'required',
       'matricula' => 'required',
-      'id_tecnico' => 'required'
+      'id_tecnico' => 'required',
     ]);
     return $validator;
   }
-  public function create(Request $request, $cooperado) {
+  public function create(Request $request, $cooperado)
+  {
     $validator = $this->companyValidator($request);
 
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
 
@@ -36,18 +39,19 @@ class CooperadoController extends Controller {
     } catch (Exception $e) {
       return response()->json([
         'message' => 'fail',
-        'errors' => [$e->getMessage()]
+        'errors' => [$e->getMessage()],
       ], 500);
     }
     return response()->json(['message' => 'success']);
   }
-  public function update(Request $request, $id) {
+  public function update(Request $request, $id)
+  {
     $validator = $this->companyValidator($request);
 
-    if($validator->fails() ) {
+    if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
     try {
@@ -57,11 +61,12 @@ class CooperadoController extends Controller {
     } catch (Exception $e) {
       response()->json([
         'message' => 'fail',
-        'errors' => [$e->getMessage()]
+        'errors' => [$e->getMessage()],
       ], 500);
     }
   }
-  public function transfer(Request $request, $id) {
+  public function transfer(Request $request, $id)
+  {
     $validator = Validator::make(
       $request->all(),
       ['cooperado' => 'required|integer']
@@ -70,7 +75,7 @@ class CooperadoController extends Controller {
     if ($validator->fails()) {
       return response()->json([
         'message' => 'fail',
-        'errors' => $validator->errors()
+        'errors' => $validator->errors(),
       ]);
     }
 
@@ -81,7 +86,7 @@ class CooperadoController extends Controller {
     } catch (Exception $e) {
       return response()->json([
         'message' => 'fail',
-        'errors' => [$e->getMessage()]
+        'errors' => [$e->getMessage()],
       ], 500);
     }
     return response()->json(['message' => 'success']);
