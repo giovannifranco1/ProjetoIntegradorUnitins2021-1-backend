@@ -7,20 +7,21 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CooperadoController extends Controller
+class PropriedadeController extends Controller
 {
   private function companyValidator($request)
   {
     $validator = Validator::make($request->all(), [
-      'nome' => 'required|max:255',
-      'tamanho_area' => 'required|min',
+      'nome' => 'required|string|max:255',
+      'tamanho_area' => 'required|numeric|min:0.01',
       'localidade' => 'required',
       'matricula' => 'required',
       'id_tecnico' => 'required',
+      'id_cooperado' => 'required',
     ]);
     return $validator;
   }
-  public function create(Request $request, $cooperado)
+  public function create(Request $request)
   {
     $validator = $this->companyValidator($request);
 
@@ -32,7 +33,6 @@ class CooperadoController extends Controller
     }
 
     $propriedade = $request->all();
-    $propriedade['id_cooperado'] = $cooperado;
 
     try {
       Propriedade::create($propriedade);
@@ -90,5 +90,11 @@ class CooperadoController extends Controller
       ], 500);
     }
     return response()->json(['message' => 'success']);
+  }
+  public function findByCooperado($cooperado)
+  {
+    return Propriedade::where('id_cooperado', $cooperado)
+      ->select('id', 'nome', 'localidade', 'tamanho_area', 'matricula', 'id_cooperado', 'id_tecnico')
+      ->get();
   }
 }

@@ -27,8 +27,7 @@ Route::group([
 
   Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
   Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
-  Route::post('refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
-  Route::post('me', 'App\Http\Controllers\Auth\AuthController@me');
+  Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
 
 });
 #Rotas Tecnico
@@ -44,10 +43,15 @@ Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
 Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
-Route::post('cooperado/{cooperado}/propriedade', 'App\Http\Controllers\PropriedadeController@create');
 Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
+Route::put('cooperado/{id}/disable', 'App\Http\Controllers\CooperadoController@disable');
+Route::put('cooperado/{id}/enable', 'App\Http\Controllers\CooperadoController@enable');
+
+#Propriedade
+Route::get('propriedades/{cooperado}', 'App\Http\Controllers\PropriedadeController@findByCooperado');
+Route::post('propriedade/store', 'App\Http\Controllers\PropriedadeController@create');
 Route::put('propriedade/{id}', 'App\Http\Controllers\PropriedadeController@update');
-Route::put('propriedade/{id}/transfer', 'App\Http\Controllers\PropriedadeController@transfer');
+Route::put('propriedade/transferir/{id}', 'App\Http\Controllers\PropriedadeController@transfer');
 
 #Rotas painel
 Route::get('painel', 'App\Http\Controllers\PainelController@index');
@@ -59,7 +63,8 @@ Route::put('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@upda
 Route::delete('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@destroy');
 
 #Rotas Visita
-Route::get('visitas/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::get('visita/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTecnico');
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
 Route::put('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
