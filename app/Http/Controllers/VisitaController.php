@@ -27,7 +27,8 @@ class VisitaController extends Controller
     return $validator;
   }
 
-  private function validateUpdate($request) {
+  private function validateUpdate($request)
+  {
     $validator = Validator::make($request->all(), [
       'horaEstimada' => 'required|date',
       'dia_visita' => 'required|date',
@@ -52,7 +53,8 @@ class VisitaController extends Controller
     return str_replace('\s+', '-', strtolower($url));
   }
 
-  public function findByTecnico($id) {
+  public function findByTecnico($id)
+  {
     $visitas = Visita::select('visita.*', 'p.nome as propriedade')
       ->join('propriedade as p', 'p.id', 'visita.id_propriedade')
       ->join('tecnico as t', 't.id', 'visita.id_tecnico')
@@ -91,49 +93,54 @@ class VisitaController extends Controller
       DB::rollBack();
       return response()->json([
         'message' => 'fail',
-        'errors' => [$e->getMessage()]
+        'errors' => [$e->getMessage()],
       ], 400);
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
   public function update(Request $request, $id)
   {
-  $validator = $this->validateUpdate($request);
+    $validator = $this->validateUpdate($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
         'errors' => $validator->errors(),
       ], 422);
     }
-    
-    $data = $request->except(['imagem', 'observacao', 'cultura', 'relatorio']);
-    $talhao = $request->only(['cultura', 'relatorio']);
+    $data = $request->except(['talhoes']);
     $data['dia_visita'] = new DateTime($data['dia_visita']);
     $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
-    
-
+    $visita = Visita::find($id);
     try {
       DB::beginTransaction();
-      $visita = Visita::find($id);
-      if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-        $name = $this->transformUrl($request->arquivo->getClientOriginalName());
-        $extension = $request->arquivo->extension();
-        $crypto = md5($name . date('HisYmd')) . '.' . $extension;
-        $local = "Visitas/{$visita->id}";
-        $upload = $request->arquivo->storeAs($local, $crypto, 'public');
+      $talhoes = $request->talhoes;
+      foreach ($talhoes as $talhao) {
+        $talhao_create = Talhao::create([
+          'cultura' => $talhao['cultura'],
+          'relatorio' => $talhao['relatorio'],
+          'id_visita' => $id,
+        ]);
+        foreach ($talhao['imagens'] as $imagem) {
+          $name = $this->transformUrl($imagem->getClientOriginalName());
+          $extension = $imagem->extension();
+          $crypto = md5($name . date('HisYmd')) . '.' . $extension;
+          $local = "Visitas/{$visita->id}/{$talhao_create->id}";
+          $upload = $imagem->storeAs($local, $crypto, 'public');
+          $foto_talhao = [
+            'name' => $name,
+            'imagem' => $upload,
+            'id_talhao' => $talhao_create->id,
+          ];
+          FotoTalhao::create($foto_talhao);
+        }
       }
-      
+
       $visita->update($data);
-      $talhao = Talhao::create($talhao);
-      $foto_talhao['name'] = $name;
-      $foto_talhao['imagem'] = $upload;
-      $foto_talhao['id_talhao'] = $talhao->id;
-      FotoTalhao::create($foto_talhao);
     } catch (Exception $e) {
       DB::rollBack();
       return response()->json([
         'message' => 'fail',
-        'errors' => [$e->getMessage()]
+        'errors' => [$e->getMessage()],
       ], 400);
     }
     return response()->json(['message' => 'Editado com sucesso!']);
