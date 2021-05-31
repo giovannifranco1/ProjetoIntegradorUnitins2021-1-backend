@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FotoTalhao;
+use App\Models\Talhao;
 use App\Models\Tecnico;
 use App\Models\Visita;
 use DateTime;
@@ -19,7 +21,8 @@ class VisitaController extends Controller
       'dia_visita' => 'required|date',
       'id_user' => 'required',
       'id_propriedade' => 'required',
-      'motivo_visita' => 'required|string'
+      'motivo_visita' => 'required',
+      'imagem' => 'mimetypes:image/*',
     ]);
     return $validator;
   }
@@ -44,6 +47,10 @@ class VisitaController extends Controller
 
     return response()->json($visita);
   }
+  private function transformUrl($url)
+  {
+    return str_replace('\s+', '-', strtolower($url));
+  }
 
   public function findByTecnico($id) {
     $visitas = Visita::select('visita.*', 'p.nome as propriedade')
@@ -62,10 +69,9 @@ class VisitaController extends Controller
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
-
     $data = $request->all();
     $data['dia_visita'] = new DateTime($data['dia_visita']);
     $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
@@ -90,27 +96,39 @@ class VisitaController extends Controller
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
-
   public function update(Request $request, $id)
   {
-    $validator = $this->validateUpdate($request);
-
+  $validator = $this->validateUpdate($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
     
-    $data = $request->all();
+    $data = $request->except(['imagem', 'observacao', 'cultura', 'relatorio']);
+    $talhao = $request->only(['cultura', 'relatorio']);
     $data['dia_visita'] = new DateTime($data['dia_visita']);
     $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
+    
 
     try {
       DB::beginTransaction();
       $visita = Visita::find($id);
+      if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+        $name = $this->transformUrl($request->arquivo->getClientOriginalName());
+        $extension = $request->arquivo->extension();
+        $crypto = md5($name . date('HisYmd')) . '.' . $extension;
+        $local = "Visitas/{$visita->id}";
+        $upload = $request->arquivo->storeAs($local, $crypto, 'public');
+      }
+      
       $visita->update($data);
-      DB::commit();
+      $talhao = Talhao::create($talhao);
+      $foto_talhao['name'] = $name;
+      $foto_talhao['imagem'] = $upload;
+      $foto_talhao['id_talhao'] = $talhao->id;
+      FotoTalhao::create($foto_talhao);
     } catch (Exception $e) {
       DB::rollBack();
       return response()->json([
@@ -121,18 +139,18 @@ class VisitaController extends Controller
     return response()->json(['message' => 'Editado com sucesso!']);
   }
 
-  public function destroy(Request $request, $id)
+  public function cancel(Request $request, $id)
   {
     $data = $request->all();
     $visita = Visita::find($id);
     try {
-      DB::beginTransaction();
-      $visita->delete();
-      DB::commit();
+      $visita->update($data);
     } catch (Exception $e) {
-      DB::rollBack();
-      return response()->json(['message' => 'Erro ao remover'], 400);
+      return response()->json([
+        'message' => 'Erro ao Cancelar',
+        'errors' => [$e->getMessage()],
+      ], 500);
     }
-    return response()->json(['message' => 'Removido com sucesso!']);
+    return response()->json(['message' => 'Cancelado com sucesso!']);
   }
 }

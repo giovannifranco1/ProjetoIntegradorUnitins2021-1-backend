@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\RoleController as AuthRoleController;
-use App\Http\Controllers\Auth\RoleController\RoleController;
-use App\Models\MotivoVisita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,22 +12,22 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::group([
 
-    'middleware' => 'api',
-    'prefix' => 'auth'
+  'middleware' => 'api',
+  'prefix' => 'auth',
 
 ], function ($router) {
 
-    Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
-    Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
-    Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
+  Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
+  Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
+  Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
 
 });
 #Rotas Tecnico
@@ -57,7 +54,7 @@ Route::put('propriedade/{id}', 'App\Http\Controllers\PropriedadeController@updat
 Route::put('propriedade/transferir/{id}', 'App\Http\Controllers\PropriedadeController@transfer');
 
 #Rotas painel
-Route::get('painel' , 'App\Http\Controllers\PainelController@index');
+Route::get('painel', 'App\Http\Controllers\PainelController@index');
 
 #Rotas Motivo visita
 Route::get('motivos', 'App\Http\Controllers\MotivoVisitaController@index');
@@ -71,7 +68,7 @@ Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTec
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
 Route::put('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
-
+Route::put('visitas/image/{visita}', 'App\Http\Controllers\VisitaController@imageStore');
 #Rotas Roles
 Route::get('grupos', 'App\Http\Controllers\Auth\RoleController@index');
 Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');
