@@ -30,8 +30,7 @@ Route::group([
 
     Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
     Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
-    Route::post('refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
-    Route::post('me', 'App\Http\Controllers\Auth\AuthController@me');
+    Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
 
 });
 #Rotas Tecnico
@@ -48,6 +47,8 @@ Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll'
 Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
+Route::put('cooperado/{id}/disable', 'App\Http\Controllers\CooperadoController@disable');
+Route::put('cooperado/{id}/enable', 'App\Http\Controllers\CooperadoController@enable');
 
 #Propriedade
 Route::get('propriedades/{cooperado}', 'App\Http\Controllers\PropriedadeController@findByCooperado');
@@ -65,7 +66,8 @@ Route::put('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@upda
 Route::delete('motivos/{motivo}', 'App\Http\Controllers\MotivoVisitaController@destroy');
 
 #Rotas Visita
-Route::get('visitas/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::get('visita/{visita}', 'App\Http\Controllers\VisitaController@findById');
+Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTecnico');
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
 Route::put('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
