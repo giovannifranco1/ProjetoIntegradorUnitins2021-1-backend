@@ -26,6 +26,17 @@ class VisitaController extends Controller
     ]);
     return $validator;
   }
+
+  private function validateUpdate($request)
+  {
+    $validator = Validator::make($request->all(), [
+      'horaEstimada' => 'required|date',
+      'dia_visita' => 'required|date',
+      'motivo_visita' => 'required|string',
+    ]);
+    return $validator;
+  }
+
   public function findById($id)
   {
     $visita = Visita::select('visita.*', 'p.nome as cooperado', 'pr.nome as propriedade')
@@ -64,6 +75,7 @@ class VisitaController extends Controller
       ], 422);
     }
     $data = $request->all();
+    $data['dia_visita'] = new DateTime($data['dia_visita']);
     $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
 
     try {
@@ -71,8 +83,11 @@ class VisitaController extends Controller
       $tecnico = Tecnico::select('id')
         ->where('id_user', $request->id_user)
         ->first();
+
       $data['id_tecnico'] = $tecnico->id;
+
       Visita::create($data);
+
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();
@@ -85,7 +100,7 @@ class VisitaController extends Controller
   }
   public function update(Request $request, $id)
   {
-    $validator = $this->companyValidator($request);
+    $validator = $this->validateUpdate($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
@@ -93,6 +108,8 @@ class VisitaController extends Controller
       ], 422);
     }
     $data = $request->except(['talhoes']);
+    $data['dia_visita'] = new DateTime($data['dia_visita']);
+    $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
     $visita = Visita::find($id);
     try {
       DB::beginTransaction();
@@ -117,13 +134,14 @@ class VisitaController extends Controller
           FotoTalhao::create($foto_talhao);
         }
       }
+
       $visita->update($data);
     } catch (Exception $e) {
       DB::rollBack();
       return response()->json([
-        'message' => 'Erro ao editar',
+        'message' => 'fail',
         'errors' => [$e->getMessage()],
-      ], 500);
+      ], 400);
     }
     return response()->json(['message' => 'Editado com sucesso!']);
   }
