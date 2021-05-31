@@ -26,6 +26,16 @@ class VisitaController extends Controller
     ]);
     return $validator;
   }
+
+  private function validateUpdate($request) {
+    $validator = Validator::make($request->all(), [
+      'horaEstimada' => 'required|date',
+      'dia_visita' => 'required|date',
+      'motivo_visita' => 'required|string',
+    ]);
+    return $validator;
+  }
+
   public function findById($id)
   {
     $visita = Visita::select('visita.*', 'p.nome as cooperado', 'pr.nome as propriedade')
@@ -63,6 +73,7 @@ class VisitaController extends Controller
       ], 422);
     }
     $data = $request->all();
+    $data['dia_visita'] = new DateTime($data['dia_visita']);
     $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
 
     try {
@@ -70,8 +81,11 @@ class VisitaController extends Controller
       $tecnico = Tecnico::select('id')
         ->where('id_user', $request->id_user)
         ->first();
+
       $data['id_tecnico'] = $tecnico->id;
+
       Visita::create($data);
+
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();
@@ -84,18 +98,23 @@ class VisitaController extends Controller
   }
   public function update(Request $request, $id)
   {
-    $validator = $this->companyValidator($request);
+  $validator = $this->validateUpdate($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
         'errors' => $validator->errors(),
       ], 422);
     }
+    
     $data = $request->except(['imagem', 'observacao', 'cultura', 'relatorio']);
     $talhao = $request->only(['cultura', 'relatorio']);
-    $visita = Visita::find($id);
+    $data['dia_visita'] = new DateTime($data['dia_visita']);
+    $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
+    
+
     try {
       DB::beginTransaction();
+      $visita = Visita::find($id);
       if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
         $name = $this->transformUrl($request->arquivo->getClientOriginalName());
         $extension = $request->arquivo->extension();
@@ -103,6 +122,7 @@ class VisitaController extends Controller
         $local = "Visitas/{$visita->id}";
         $upload = $request->arquivo->storeAs($local, $crypto, 'public');
       }
+      
       $visita->update($data);
       $talhao = Talhao::create($talhao);
       $foto_talhao['name'] = $name;
@@ -112,9 +132,9 @@ class VisitaController extends Controller
     } catch (Exception $e) {
       DB::rollBack();
       return response()->json([
-        'message' => 'Erro ao editar',
-        'errors' => [$e->getMessage()],
-      ], 500);
+        'message' => 'fail',
+        'errors' => [$e->getMessage()]
+      ], 400);
     }
     return response()->json(['message' => 'Editado com sucesso!']);
   }

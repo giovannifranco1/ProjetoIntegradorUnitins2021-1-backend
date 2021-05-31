@@ -26,6 +26,7 @@ class PainelController extends Controller {
       ->join('users as u', 'u.id', 't.id_user')
 
       // Condições
+      ->where('t.nome','like',  "%{$request->nome_tecnico}%")
       ->where('p.nome','like',  "%{$request->nome_cooperado}%")
       ->where('pr.nome', 'like', "%{$request->nome_propriedade}%")
       ->where('v.dia_visita' , 'like', "%{$request->dia_visita}%")
