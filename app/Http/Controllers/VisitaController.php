@@ -32,10 +32,8 @@ class VisitaController extends Controller
       'horaEstimada' => 'required|date',
       'dia_visita' => 'required|date',
       'motivo_visita' => 'required|string',
-      'talhoes' => 'array',
       'talhoes.cultura' => 'string',
       'talhoes.relatorio' => 'string',
-      'talhoes.imagens' => 'array|mimetypes:image/*',
     ]);
     return $validator;
   }
@@ -116,14 +114,14 @@ class VisitaController extends Controller
     $visita = Visita::find($id);
     try {
       DB::beginTransaction();
-      $talhoes = $request->talhoes;
+      $talhoes = json_decode($request->talhoes);
       foreach ($talhoes as $talhao) {
         $talhao_create = Talhao::create([
-          'cultura' => $talhao['cultura'],
-          'relatorio' => $talhao['relatorio'],
+          'cultura' => $talhao->cultura,
+          'relatorio' => $talhao->relatorio,
           'id_visita' => $id,
         ]);
-        foreach ($talhao['imagens'] as $imagem) {
+        foreach ($talhao->imagens as $imagem) {
           $name = $this->transformUrl($imagem->getClientOriginalName());
           $extension = $imagem->extension();
           $crypto = md5($name . date('HisYmd')) . '.' . $extension;
@@ -137,7 +135,7 @@ class VisitaController extends Controller
           FotoTalhao::create($foto_talhao);
         }
       }
-
+      dd($data->observacao);
       $visita->update($data);
     } catch (Exception $e) {
       DB::rollBack();
