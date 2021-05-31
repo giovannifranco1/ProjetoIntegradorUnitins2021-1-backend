@@ -17,6 +17,9 @@ class CreateTalhoesTable extends Migration
       $table->id();
       $table->string('cultura');
       $table->string('relatorio');
+      $table->string('id_visita');
+      $table->unsignedBigInteger('id_visita');
+      $table->foreign('id_visita')->references('id')->on('visita')->onUpdate('cascade')->onDelete('cascade');
       $table->timestamps();
     });
   }
