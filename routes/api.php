@@ -61,12 +61,15 @@ Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTec
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
 Route::post('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
+<<<<<<< HEAD
 Route::put('visitas/image/{visita}', 'App\Http\Controllers\VisitaController@imageStore');
 
 #Rotas Histórico
 Route::get('historico', 'App\Http\Controllers\HistoricoController@findAll');
 Route::get('historico/visita/{id}', 'App\Http\Controllers\HistoricoController@findById');
 
+=======
+>>>>>>> 1bb71480d678b70eb8d9cbd01d20e11e019af5ec
 #Rotas Roles
 Route::get('grupos', 'App\Http\Controllers\Auth\RoleController@index');
 Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');

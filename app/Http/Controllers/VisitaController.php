@@ -22,9 +22,6 @@ class VisitaController extends Controller
       'id_user' => 'required',
       'id_propriedade' => 'required',
       'motivo_visita' => 'required',
-      'talhoes' => 'array',
-      'talhoes.cultura' => 'string',
-      'talhoes.imagens' => 'array',
     ]);
     return $validator;
   }
@@ -35,6 +32,10 @@ class VisitaController extends Controller
       'horaEstimada' => 'required|date',
       'dia_visita' => 'required|date',
       'motivo_visita' => 'required|string',
+      'talhoes' => 'array',
+      'talhoes.cultura' => 'string',
+      'talhoes.relatorio' => 'string',
+      'talhoes.imagens' => 'array|mimetypes:image/*',
     ]);
     return $validator;
   }
