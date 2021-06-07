@@ -22,7 +22,9 @@ class VisitaController extends Controller
       'id_user' => 'required',
       'id_propriedade' => 'required',
       'motivo_visita' => 'required',
-      'imagem' => 'mimetypes:image/*',
+      'talhoes' => 'array',
+      'talhoes.cultura' => 'string',
+      'talhoes.imagens' => 'array',
     ]);
     return $validator;
   }
@@ -114,6 +116,7 @@ class VisitaController extends Controller
     try {
       DB::beginTransaction();
       $talhoes = $request->talhoes;
+      return $talhoes;
       foreach ($talhoes as $talhao) {
         $talhao_create = Talhao::create([
           'cultura' => $talhao['cultura'],
@@ -146,8 +149,7 @@ class VisitaController extends Controller
     return response()->json(['message' => 'Editado com sucesso!']);
   }
 
-  public function cancel(Request $request, $id)
-  {
+  public function cancel(Request $request, $id) {
     $data = $request->all();
     $visita = Visita::find($id);
     try {
