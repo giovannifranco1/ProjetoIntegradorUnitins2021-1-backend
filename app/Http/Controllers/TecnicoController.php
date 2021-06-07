@@ -187,6 +187,78 @@ class TecnicoController extends Controller {
       ]);
     }
   }
+
+  public function getProfile() {
+    $id = auth()->id();
+
+    $tecnico = Tecnico::from('tecnico as tc')
+    ->select(
+      'u.name as nome',
+      'tc.sobrenome',
+      'u.email',
+      'tc.cpf',
+      DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
+    )
+    ->join('users as u', 'u.id', 'tc.id_user')
+    ->join('telefone as t', 't.id', 'tc.id_telefone')
+    ->where('u.id', $id)
+    ->first();
+
+    return response()->json($tecnico);
+  }
+
+  public function editProfile(Request $request) {
+    $id = auth()->id();
+
+    $user_data = [];
+    $user_data['email'] = $request->email;
+    $user_data['name'] = $request->nome;
+
+    $tecn_data = $request->only(['nome', 'cpf', 'sobrenome']);
+
+    try {
+      DB::beginTransaction();
+
+      User::find($id)->update($user_data);
+      Tecnico::where('id_user', $id)->update($tecn_data);
+
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollBack();
+
+      return response()->json([
+        'message' => 'error',
+        'errors' => [$e->getMessage()]
+      ]);
+    }
+  }
+
+  public function editProfilePassword(Request $request) {
+    $validator = Validator::make($request->all(), [
+      'senha' => 'required|string|min:8'
+    ]);
+
+    if ($validator->fails()) return response()->json([
+      'message' => 'error',
+      'errors' => $validator->errors()
+    ]);
+
+    $id = auth()->id();
+
+    try {
+      User::find($id)->update([
+        'password' => bcrypt($request->senha)
+      ]);
+
+      return response()->json(['message' => 'success']);
+    } catch (Exception $e) {
+      return response()->json([
+        'message' => 'error',
+        'errors' => [$e->getMessage()]
+      ]);
+    }
+  }
+
   private function setStatus(bool $status, $id) {
     try {
       DB::beginTransaction();
