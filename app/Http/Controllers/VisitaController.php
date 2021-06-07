@@ -32,8 +32,6 @@ class VisitaController extends Controller
       'horaEstimada' => 'required|date',
       'dia_visita' => 'required|date',
       'motivo_visita' => 'required|string',
-      'talhoes.cultura' => 'string',
-      'talhoes.relatorio' => 'string',
     ]);
     return $validator;
   }
@@ -114,31 +112,33 @@ class VisitaController extends Controller
     $visita = Visita::find($id);
     try {
       DB::beginTransaction();
-      $talhoes = json_decode($request->talhoes);
-      return $talhoes;
-      foreach ($talhoes as $talhao) {
+      $talhoes = $request->talhoes;
+      for ($i = 0; $i < count($talhoes); $i++) {
+        $talhao = $talhoes[$i];
         $talhao_create = Talhao::create([
-          'cultura' => $talhao->cultura,
-          'relatorio' => $talhao->relatorio,
-          'id_visita' => $id,
+          "cultura" => $talhao['cultura'],
+          "relatorio" => $talhao['relatorio'],
+          "id_visita" => $id,
         ]);
-        foreach ($talhao->imagens as $imagem) {
+        for ($x = 0; $x < count($request->imagem[$i]); $x++) {
+          $imagem = $request->imagem[$i][$x];
           $name = $this->transformUrl($imagem->getClientOriginalName());
           $extension = $imagem->extension();
           $crypto = md5($name . date('HisYmd')) . '.' . $extension;
-          $local = "Visitas/{$visita->id}/{$talhao_create->id}";
+          $local = "Visitas/{$id}/{$talhao_create->id}";
           $upload = $imagem->storeAs($local, $crypto, 'public');
           $foto_talhao = [
-            'name' => $name,
+            'nome' => $name,
             'imagem' => $upload,
             'id_talhao' => $talhao_create->id,
           ];
           FotoTalhao::create($foto_talhao);
         }
       }
-      dd($data->observacao);
       $visita->update($data);
+      DB::commit();
     } catch (Exception $e) {
+      dd($e);
       DB::rollBack();
       return response()->json([
         'message' => 'fail',
@@ -148,7 +148,8 @@ class VisitaController extends Controller
     return response()->json(['message' => 'Editado com sucesso!']);
   }
 
-  public function cancel(Request $request, $id) {
+  public function cancel(Request $request, $id)
+  {
     $data = $request->all();
     $visita = Visita::find($id);
     try {

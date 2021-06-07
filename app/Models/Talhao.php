@@ -8,6 +8,7 @@ class Talhao extends Model
 {
   protected $table = 'talhao';
   protected $fillable = [
+    'nome',
     'cultura',
     'relatorio',
   ];
