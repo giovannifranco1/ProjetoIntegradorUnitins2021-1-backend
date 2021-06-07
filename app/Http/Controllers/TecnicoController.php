@@ -16,6 +16,7 @@ class TecnicoController extends Controller {
   public function __construct()
   {
     $this->middleware('permission:gerenciar_tecnico');
+    $this->middleware('permission:gerenciar_propriedade', ['only' => ['findAll']]);
   }
 
   private function companyValidator($request) {
@@ -159,6 +160,32 @@ class TecnicoController extends Controller {
     if (sizeOf($user->roles) > 0) $tecnico->grupo = $user->roles[0];
 
     return response()->json($tecnico);
+  }
+
+  public function changePassword(Request $request, $id) {
+    $validator = Validator::make($request->all(), [
+      'senha' => 'required|string|min:8'
+    ]);
+
+    if ($validator->fails()) return response()->json([
+      'message' => 'error',
+      'errors' => $validator->errors()
+    ]);
+
+    try {
+      $tecnico = Tecnico::find($id);
+
+      User::find($tecnico->id_user)->update([
+        'password' => bcrypt($request->senha)
+      ]);
+
+      return response()->json(['message' => 'success']);
+    } catch (Exception $e) {
+      return response()->json([
+        'message' => 'error',
+        'errors' => [$e->getMessage()]
+      ]);
+    }
   }
   private function setStatus(bool $status, $id) {
     try {
