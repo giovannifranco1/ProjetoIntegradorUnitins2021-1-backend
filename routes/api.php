@@ -31,6 +31,9 @@ Route::put('tecnico/{id}', 'App\Http\Controllers\TecnicoController@update');
 Route::put('tecnico/{id}/disable', 'App\Http\Controllers\TecnicoController@disable');
 Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable');
 Route::put('tecnico/{id}/password', 'App\Http\Controllers\TecnicoController@changePassword');
+Route::get('profile', 'App\Http\Controllers\TecnicoController@getProfile');
+Route::put('profile', 'App\Http\Controllers\TecnicoController@editProfile');
+Route::put('profile/password', 'App\Http\Controllers\TecnicoController@editProfilePassword');
 
 #Rotas Cooperado
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
