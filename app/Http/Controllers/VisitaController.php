@@ -115,6 +115,7 @@ class VisitaController extends Controller
     try {
       DB::beginTransaction();
       $talhoes = json_decode($request->talhoes);
+      return $talhoes;
       foreach ($talhoes as $talhao) {
         $talhao_create = Talhao::create([
           'cultura' => $talhao->cultura,
@@ -147,8 +148,7 @@ class VisitaController extends Controller
     return response()->json(['message' => 'Editado com sucesso!']);
   }
 
-  public function cancel(Request $request, $id)
-  {
+  public function cancel(Request $request, $id) {
     $data = $request->all();
     $visita = Visita::find($id);
     try {

@@ -18,17 +18,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
   return $request->user();
 });
 
-Route::group([
-
-  'middleware' => 'api',
-  'prefix' => 'auth',
-
-], function ($router) {
-
+Route::group(['middleware' => 'api','prefix' => 'auth',], function () {
   Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
   Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
   Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
-
 });
 #Rotas Tecnico
 Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll');
@@ -37,7 +30,7 @@ Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
 Route::put('tecnico/{id}', 'App\Http\Controllers\TecnicoController@update');
 Route::put('tecnico/{id}/disable', 'App\Http\Controllers\TecnicoController@disable');
 Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable');
-// Route::put('tecnico/{id}/change_password', 'App\Http\Controllers\TecnicoController@changePassword');
+Route::put('tecnico/{id}/password', 'App\Http\Controllers\TecnicoController@changePassword');
 
 #Rotas Cooperado
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
@@ -68,6 +61,12 @@ Route::get('visitas/{tecnico}', 'App\Http\Controllers\VisitaController@findByTec
 Route::post('visitas', 'App\Http\Controllers\VisitaController@store');
 Route::post('visitas/{visita}', 'App\Http\Controllers\VisitaController@update');
 Route::delete('visitas/{visita}', 'App\Http\Controllers\VisitaController@destroy');
+Route::put('visitas/image/{visita}', 'App\Http\Controllers\VisitaController@imageStore');
+
+#Rotas Histórico
+Route::get('historico', 'App\Http\Controllers\HistoricoController@findAll');
+Route::get('historico/visita/{id}', 'App\Http\Controllers\HistoricoController@findById');
+
 #Rotas Roles
 Route::get('grupos', 'App\Http\Controllers\Auth\RoleController@index');
 Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');
