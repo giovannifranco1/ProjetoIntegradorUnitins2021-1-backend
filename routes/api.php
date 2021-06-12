@@ -78,6 +78,7 @@ Route::delete('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@destr
 
 #Relatórios
 Route::group(['prefix' => 'relatorio'], function () {
+  Route::get('propriedade', 'App\Http\Controllers\RelatorioPropriedadeController');
   Route::get('cooperado', 'App\Http\Controllers\RelatorioCooperadoController');
   Route::get('tecnico', 'App\Http\Controllers\RelatorioTecnicoController');
 });
