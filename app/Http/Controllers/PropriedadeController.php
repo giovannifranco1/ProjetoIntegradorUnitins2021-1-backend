@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Validator;
 
 class PropriedadeController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:gerenciar_propriedade')->except(['findByCooperado']);
+  }
   private function companyValidator($request)
   {
     $validator = Validator::make($request->all(), [

@@ -8,10 +8,10 @@ use App\Models\Visita;
 
 class HistoricoController extends Controller
 {
-  // public function __construct()
-  // {
-  //   $this->middleware('permission:gerenciar_visita');
-  // }
+  public function __construct()
+  {
+    $this->middleware('permission:gerenciar_visita');
+  }
 
   public function findAll()
   {
