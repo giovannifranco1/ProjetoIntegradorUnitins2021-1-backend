@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
   return $request->user();
 });
 
-Route::group(['middleware' => 'api','prefix' => 'auth',], function () {
+Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
   Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
   Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
   Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
@@ -75,3 +75,5 @@ Route::get('grupos', 'App\Http\Controllers\Auth\RoleController@index');
 Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');
 Route::put('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@update');
 Route::delete('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@destroy');
+
+#Rota Email
