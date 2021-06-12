@@ -10,6 +10,7 @@ class Talhao extends Model
   protected $fillable = [
     'nome',
     'cultura',
+    'id_visita',
     'relatorio',
   ];
 }

@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
   return $request->user();
 });
 
-Route::group(['middleware' => 'api','prefix' => 'auth',], function () {
+Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
   Route::post('login', 'App\Http\Controllers\Auth\AuthController@login')->name('login');
   Route::post('logout', 'App\Http\Controllers\Auth\AuthController@logout');
   Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
@@ -81,3 +81,5 @@ Route::group(['prefix' => 'relatorio'], function () {
   Route::get('cooperado', 'App\Http\Controllers\RelatorioCooperadoController');
   Route::get('tecnico', 'App\Http\Controllers\RelatorioTecnicoController');
 });
+
+#Rota Email
