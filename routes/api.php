@@ -84,3 +84,4 @@ Route::group(['prefix' => 'relatorio'], function () {
 });
 
 #Rota Email
+Route::post('recuperar', 'App\Http\Controllers\RecuperarSenhaController');

@@ -17,17 +17,21 @@ class RelatorioCooperadoController extends Controller
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\Response
    */
-  public function __invoke(Request $request) {
+
+  public function __invoke(Request $request)
+  {
     $validator = Validator::make($request->all(), [
       'cooperado' => 'required|integer',
       'start' => 'required|date',
-      'end' => 'required|date'
+      'end' => 'required|date',
     ]);
 
-    if ($validator->fails()) return response()->json([
-      'message' => 'error',
-      'errors' => $validator->errors()
-    ]);
+    if ($validator->fails()) {
+      return response()->json([
+        'message' => 'error',
+        'errors' => $validator->errors(),
+      ]);
+    }
 
     $idCooperado = $request->cooperado;
     $start = new DateTime($request->start);
@@ -39,7 +43,7 @@ class RelatorioCooperadoController extends Controller
       'p.sobrenome',
       'p.email',
       DB::raw('CONCAT(\'(\', t.codigo_area, \') \', t.numero) as phone')
-    ) ->join('pessoa as p', 'p.id', 'cooperado.id_pessoa')
+    )->join('pessoa as p', 'p.id', 'cooperado.id_pessoa')
       ->join('telefone as t', 't.id', 'p.id_telefone')
       ->find($idCooperado);
 
@@ -49,14 +53,14 @@ class RelatorioCooperadoController extends Controller
       'p.nome as propriedade',
       'v.status',
       't.nome as tecnico'
-    ) ->from('visita as v')
+    )->from('visita as v')
 
-      // JOIN's
+    // JOIN's
       ->join('propriedade as p', 'p.id', 'v.id_propriedade')
       ->join('cooperado as c', 'c.id', 'p.id_cooperado')
       ->join('tecnico as t', 't.id', 'v.id_tecnico')
 
-      // Condicionais
+    // Condicionais
       ->where('c.id', $idCooperado)
       ->whereBetween('dia_visita', [$start, $end])
       ->get();
@@ -65,9 +69,9 @@ class RelatorioCooperadoController extends Controller
       'cooperado' => $cooperado,
       'periodo' => [
         'inicio' => $request->start,
-        'fim' => $request->end
+        'fim' => $request->end,
       ],
-      'visitas' => $visitas
+      'visitas' => $visitas,
     ]);
   }
 }
