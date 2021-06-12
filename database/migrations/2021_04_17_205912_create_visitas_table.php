@@ -21,7 +21,7 @@ class CreateVisitasTable extends Migration
             $table->unsignedBigInteger('id_propriedade');
             $table->string('motivo_visita');
             $table->string('status')->default('aberto');
-            $table->longText('observacao')->default('');
+            $table->longText('observacao')->default(' ');
             $table->foreign('id_tecnico')->references('id')->on('tecnico')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('id_propriedade')->references('id')->on('propriedade')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
