@@ -76,4 +76,10 @@ Route::post('grupos', 'App\Http\Controllers\Auth\RoleController@store');
 Route::put('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@update');
 Route::delete('grupos/{visita}', 'App\Http\Controllers\Auth\RoleController@destroy');
 
+#Relatórios
+Route::group(['prefix' => 'relatorio'], function () {
+  Route::get('cooperado', 'App\Http\Controllers\RelatorioCooperadoController');
+  Route::get('tecnico', 'App\Http\Controllers\RelatorioTecnicoController');
+});
+
 #Rota Email
