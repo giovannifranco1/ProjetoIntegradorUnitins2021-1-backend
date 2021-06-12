@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Validator;
 
 class MotivoVisitaController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:gerenciar_motivos')->except(['index']);
+  }
+
   private function companyValidator($request)
   {
     $validator = Validator::make($request->all(), [
@@ -17,15 +22,17 @@ class MotivoVisitaController extends Controller
     ]);
     return $validator;
   }
-  public function index() {
+  public function index()
+  {
     return response()->json(MotivoVisita::get());
   }
-  public function store(Request $request) {
+  public function store(Request $request)
+  {
     $validator = $this->companyValidator($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
     $data = $request->all();
@@ -37,18 +44,19 @@ class MotivoVisitaController extends Controller
       DB::rollBack();
       return response()->json([
         'message' => 'fail',
-        'errors' => [$e->getMessage()]
+        'errors' => [$e->getMessage()],
       ], 500);
     }
     return response()->json(['message' => 'Cadastrado com sucesso!']);
   }
-  public function update(Request $request, $id) {
+  public function update(Request $request, $id)
+  {
     $validator = $this->companyValidator($request);
 
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
 
@@ -70,7 +78,7 @@ class MotivoVisitaController extends Controller
       DB::beginTransaction();
 
       MotivoVisita::find($id)->delete();
-      
+
       DB::commit();
     } catch (Exception $e) {
       DB::rollBack();

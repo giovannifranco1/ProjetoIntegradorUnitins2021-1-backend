@@ -9,6 +9,7 @@ use App\Models\Visita;
 use DateTime;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -63,7 +64,6 @@ class VisitaController extends Controller
 
     return response()->json($visitas);
   }
-
   public function store(Request $request)
   {
     $validator = $this->companyValidator($request);
@@ -99,6 +99,17 @@ class VisitaController extends Controller
   }
   public function update(Request $request, $id)
   {
+    $visitas = Visita::select('visita.id')
+      ->join('tecnico as t', 't.id', 'visita.id_tecnico')
+      ->join('users as u', 'u.id', 't.id_user')
+      ->where('visita.id', $id)
+      ->where('u.id', Auth::user()->id)
+      ->first();
+
+    if (empty($visitas)) {
+      return response()->json(null, 401);
+    }
+
     $validator = $this->validateUpdate($request);
     if ($validator->fails()) {
       return response()->json([
@@ -113,28 +124,31 @@ class VisitaController extends Controller
     try {
       DB::beginTransaction();
       $talhoes = $request->talhoes;
-      for ($i = 0; $i < count($talhoes); $i++) {
-        $talhao = $talhoes[$i];
-        $talhao_create = Talhao::create([
-          "cultura" => $talhao['cultura'],
-          "relatorio" => $talhao['relatorio'],
-          "id_visita" => $id,
-        ]);
-        for ($x = 0; $x < count($request->imagem[$i]); $x++) {
-          $imagem = $request->imagem[$i][$x];
-          $name = $this->transformUrl($imagem->getClientOriginalName());
-          $extension = $imagem->extension();
-          $crypto = md5($name . date('HisYmd')) . '.' . $extension;
-          $local = "Visitas/{$id}/{$talhao_create->id}";
-          $upload = $imagem->storeAs($local, $crypto, 'public');
-          $foto_talhao = [
-            'nome' => $name,
-            'imagem' => $upload,
-            'id_talhao' => $talhao_create->id,
-          ];
-          FotoTalhao::create($foto_talhao);
+      if (!empty($talhoes)) {
+        for ($i = 0; $i < count($talhoes); $i++) {
+          $talhao = $talhoes[$i];
+          $talhao_create = Talhao::create([
+            "cultura" => $talhao['cultura'],
+            "relatorio" => $talhao['relatorio'],
+            "id_visita" => $id,
+          ]);
+          for ($x = 0; $x < count($request->imagem[$i]); $x++) {
+            $imagem = $request->imagem[$i][$x];
+            $name = $this->transformUrl($imagem->getClientOriginalName());
+            $extension = $imagem->extension();
+            $crypto = md5($name . date('HisYmd')) . '.' . $extension;
+            $local = "Visitas/{$id}/{$talhao_create->id}";
+            $upload = $imagem->storeAs($local, $crypto, 'public');
+            $foto_talhao = [
+              'nome' => $name,
+              'imagem' => $upload,
+              'id_talhao' => $talhao_create->id,
+            ];
+            FotoTalhao::create($foto_talhao);
+          }
         }
       }
+
       $visita->update($data);
       DB::commit();
     } catch (Exception $e) {
