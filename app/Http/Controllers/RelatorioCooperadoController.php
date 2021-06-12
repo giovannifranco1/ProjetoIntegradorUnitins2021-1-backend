@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Validator;
 
 class RelatorioCooperadoController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware('permission:gerar_relatorios');
+  }
   /**
    * Handle the incoming request.
    *

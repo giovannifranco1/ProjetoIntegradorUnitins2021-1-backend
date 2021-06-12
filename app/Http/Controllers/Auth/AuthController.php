@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tecnico;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -26,7 +25,7 @@ class AuthController extends Controller
   {
     return Validator::make($request->all(), [
       'email' => 'required|email',
-      'password' => 'required'
+      'password' => 'required',
     ]);
   }
   /**
@@ -34,12 +33,13 @@ class AuthController extends Controller
    *
    * @return \Illuminate\Http\JsonResponse
    */
-  public function login(Request $request){
+  public function login(Request $request)
+  {
     $validator = $this->companyValidator($request);
     if ($validator->fails()) {
       return response()->json([
         'message' => 'Validation Failed',
-        'errors'  => $validator->errors()
+        'errors' => $validator->errors(),
       ], 422);
     }
     $credentials = $request->all();
@@ -60,9 +60,10 @@ class AuthController extends Controller
     return response()->json(['message' => 'Successfully logged out']);
   }
 
-  public function validateToken() {
+  public function validateToken()
+  {
     return response()->json([
-      'isValid' => auth()->check()
+      'isValid' => auth()->check(),
     ]);
   }
   /**
@@ -79,19 +80,19 @@ class AuthController extends Controller
     $permissoes = User::select('name', 'id', 'email')
       ->find(auth()->id())
       ->getPermissionsViaRoles()
-      ->mapWithKeys(function($t){
-      return [
-        $t['id'] => $t['id']
-      ];
-    });
+      ->mapWithKeys(function ($t) {
+        return [
+          $t['id'] => $t['id'],
+        ];
+      });
     return response()->json([
       'access_token' => $token,
       'token_type' => 'Bearer',
       'expires_in' => auth::factory()->getTTL() * 60,
       'usuario' => [
         'data' => $user,
-        'permissoes' => $permissoes
-      ]
+        'permissoes' => $permissoes,
+      ],
     ]);
   }
 }

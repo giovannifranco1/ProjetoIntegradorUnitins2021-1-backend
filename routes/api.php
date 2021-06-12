@@ -36,7 +36,7 @@ Route::put('profile', 'App\Http\Controllers\TecnicoController@editProfile');
 Route::put('profile/password', 'App\Http\Controllers\TecnicoController@editProfilePassword');
 
 #Rotas Cooperado
-Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll');
+Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll')->middleware('auth');
 Route::get('cooperado/data/{id}', 'App\Http\Controllers\CooperadoController@findById');
 Route::post('cooperado/store', 'App\Http\Controllers\CooperadoController@store');
 Route::put('cooperado/{id}', 'App\Http\Controllers\CooperadoController@update');
