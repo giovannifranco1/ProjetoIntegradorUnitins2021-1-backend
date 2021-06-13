@@ -26,7 +26,10 @@ class RecuperarSenhaController extends Controller
     }
     $user = User::where('email', $request->email)->first();
     if (empty($user)) {
-      return response()->json(['message' => 'fail', 'errors' => ['Email não existe']], 401);
+      return response()->json([
+        'message' => 'fail',
+        'errors' => ['Email não existe']
+      ], 401);
     }
 
     $token = mt_rand(100000, 999999);
