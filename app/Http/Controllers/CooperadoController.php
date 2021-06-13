@@ -15,7 +15,7 @@ class CooperadoController extends Controller
 {
   public function __construct()
   {
-    $this->middleware('permission:gerenciar_propriedade')->except('findAll');
+    $this->middleware('permission:gerenciar_cooperado', ['except' => ['findAll']]);
   }
   private function companyValidator($request)
   {
