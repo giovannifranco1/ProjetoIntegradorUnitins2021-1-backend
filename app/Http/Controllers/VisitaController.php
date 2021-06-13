@@ -76,7 +76,6 @@ class VisitaController extends Controller
     $data = $request->all();
     $data['dia_visita'] = new DateTime($data['dia_visita']);
     $data['horario_estimado_visita'] = new DateTime($data['horaEstimada']);
-
     try {
       DB::beginTransaction();
       $tecnico = Tecnico::select('id')
