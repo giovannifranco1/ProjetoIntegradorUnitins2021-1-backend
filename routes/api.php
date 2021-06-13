@@ -24,16 +24,16 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
   Route::post('validate', 'App\Http\Controllers\Auth\AuthController@validateToken');
 });
 #Rotas Tecnico
-Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll');
+Route::get('tecnico/index', 'App\Http\Controllers\TecnicoController@findAll')->middleware('permission:gerenciar_cooperado|gerenciar_propriedade|gerenciar_tecnico');
 Route::get('tecnico/data/{id}', 'App\Http\Controllers\TecnicoController@findById');
 Route::post('tecnico/store', 'App\Http\Controllers\TecnicoController@store');
 Route::put('tecnico/{id}', 'App\Http\Controllers\TecnicoController@update');
 Route::put('tecnico/{id}/disable', 'App\Http\Controllers\TecnicoController@disable');
 Route::put('tecnico/{id}/enable', 'App\Http\Controllers\TecnicoController@enable');
 Route::put('tecnico/{id}/password', 'App\Http\Controllers\TecnicoController@changePassword');
-Route::get('profile', 'App\Http\Controllers\TecnicoController@getProfile');
-Route::put('profile', 'App\Http\Controllers\TecnicoController@editProfile');
-Route::put('profile/password', 'App\Http\Controllers\TecnicoController@editProfilePassword');
+Route::get('profile', 'App\Http\Controllers\TecnicoController@getProfile')->middleware('auth');
+Route::put('profile', 'App\Http\Controllers\TecnicoController@editProfile')->middleware('auth');
+Route::put('profile/password', 'App\Http\Controllers\TecnicoController@editProfilePassword')->middleware('auth');
 
 #Rotas Cooperado
 Route::get('cooperado/index', 'App\Http\Controllers\CooperadoController@findAll')->middleware('auth');
@@ -44,7 +44,7 @@ Route::put('cooperado/{id}/disable', 'App\Http\Controllers\CooperadoController@d
 Route::put('cooperado/{id}/enable', 'App\Http\Controllers\CooperadoController@enable');
 
 #Propriedade
-Route::get('propriedades/{cooperado}', 'App\Http\Controllers\PropriedadeController@findByCooperado');
+Route::get('propriedades/{cooperado}', 'App\Http\Controllers\PropriedadeController@findByCooperado')->middleware('auth');
 Route::post('propriedade/store', 'App\Http\Controllers\PropriedadeController@create');
 Route::put('propriedade/{id}', 'App\Http\Controllers\PropriedadeController@update');
 Route::put('propriedade/transferir/{id}', 'App\Http\Controllers\PropriedadeController@transfer');
@@ -85,3 +85,4 @@ Route::group(['prefix' => 'relatorio'], function () {
 
 #Rota Email
 Route::post('recuperar', 'App\Http\Controllers\RecuperarSenhaController');
+Route::post('alterar', 'App\Http\Controllers\RecuperarSenhaController@alterarSenha');

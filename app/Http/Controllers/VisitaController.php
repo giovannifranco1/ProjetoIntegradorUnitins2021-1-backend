@@ -148,7 +148,6 @@ class VisitaController extends Controller
           }
         }
       }
-
       $visita->update($data);
       DB::commit();
     } catch (Exception $e) {
