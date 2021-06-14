@@ -61,8 +61,10 @@ class HistoricoController extends Controller
           ->get();
       }
     }
+    $visitaResponse = $visita;
+    $visitaResponse['talhoes'] = $visita->talhoes;
 
-    return response()->json($visita->talhoes);
+    return response()->json($visitaResponse);
   }
   public function findById($id)
   {
