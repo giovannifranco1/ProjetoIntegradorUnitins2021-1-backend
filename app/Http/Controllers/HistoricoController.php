@@ -61,10 +61,16 @@ class HistoricoController extends Controller
           ->get();
       }
     }
-    $visitaResponse = $visita;
-    $visitaResponse['talhoes'] = $visita->talhoes;
+    $visitaResponse = [];
+    $i = 0;
+    foreach ($visita as $value) {
+      $visitaResponse[$i] = $value;
+      $visitaResponse[$i]->talhoes = $visita->talhoes[$i];
+      $i++;
+    }
 
     return response()->json($visitaResponse);
+
   }
   public function findById($id)
   {
