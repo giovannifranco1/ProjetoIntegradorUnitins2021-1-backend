@@ -20,7 +20,7 @@ class HistoricoController extends Controller
         'v.id',
         'u.name as nome_tecnico',
         'p.nome as nome_cooperado',
-        'v.dia_visita'
+        'v.dia_visita',
       )
     // JOIN's
       ->join('propriedade as pr', 'pr.id', 'v.id_propriedade')
@@ -38,8 +38,39 @@ class HistoricoController extends Controller
 
     // Listagem
       ->get();
+    // imagem visita
+    $visita->talhoes = [];
+    foreach ($visita as $i => $v) {
+      $visita->talhoes[$i] = Talhao::from('talhao as t')
+        ->select(
+          'id',
+          't.cultura',
+          't.relatorio'
+        )
 
-    return response()->json($visita);
+      // Condições
+        ->where('id_visita', $v->id)
+
+      //Listagem
+        ->get();
+
+      foreach ($visita->talhoes[$i] as $x => $talhao) {
+        $visita->talhoes[$i][$x]->fotos_visita = FotoTalhao::from('fotos_talhao as f')
+          ->select('f.imagem as url_imagem')
+          ->where('id_talhao', $talhao->id)
+          ->get();
+      }
+    }
+    $visitaResponse = [];
+    $i = 0;
+    foreach ($visita as $value) {
+      $visitaResponse[$i] = $value;
+      $visitaResponse[$i]->talhoes = $visita->talhoes[$i];
+      $i++;
+    }
+
+    return response()->json($visitaResponse);
+
   }
   public function findById($id)
   {
