@@ -16,9 +16,8 @@ class TecnicoController extends Controller
 
   public function __construct()
   {
-    $this->middleware('permission:gerenciar_tecnico', ['except' => [
-      'findAll', 'getProfile', 'editProfile', 'editProfilePassword',
-    ]]);
+    $this->middleware('permission:gerenciar_tecnico', ['except' => ['getProfile']]);
+    $this->middleware('permission:gerenciar_propriedade', ['only' => ['findAll']]);
   }
 
   private function companyValidator($request)
