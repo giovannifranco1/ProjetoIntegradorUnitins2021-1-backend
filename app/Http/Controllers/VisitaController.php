@@ -46,6 +46,11 @@ class VisitaController extends Controller
       ->where('visita.id', $id)
       ->first();
 
+    $visita->talhoes = Talhao::where('id_visita', $id)->get();
+    foreach ($visita->talhoes as $key => $talhao) {
+      $visita->talhoes[$key]->foto_talhao = FotoTalhao::where('id_talhao', $talhao->id)->get();
+    }
+
     return response()->json($visita);
   }
   private function transformUrl($url)
