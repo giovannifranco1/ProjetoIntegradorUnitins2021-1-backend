@@ -1,4 +1,4 @@
-<img src="./src/assets/logo.svg" alt="Sistema de Monitoramento de Visitas" width="300" style="background-color: #3e3e3e; border-radius: 4px; padding: 10px 35px"/>
+<img src="images/logo.svg" alt="Sistema de Monitoramento de Visitas" width="300" style="background-color: #3e3e3e; border-radius: 4px; padding: 10px 35px"/>
 
 # Sistema de Monitoramento de Visitas (COAPA)
 
